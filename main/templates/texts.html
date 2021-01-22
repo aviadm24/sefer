@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>chapter number: {{length}}</p>
+{% for num in range %}
+<a href="/api/texts/{{book}}/{{num}}">{{num}}</a>
+{%endfor%}
+
+<div dir="rtl">
+    {% for part in jsonResponse %}
+    <p>{{part}}</p>
+    {%endfor%}
+</div>
+{% include "ycomment.html" %}
+{% include "add_comment_button.html" %}
+</body>
+</html>

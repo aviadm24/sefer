@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1><a href="{% url 'titles' %}">titles</a></h1>
+{% for name in indexNames %}
+<a href="/api/texts/{{name.cat}}/">{{name.heCat}}</a>
+{%endfor%}
+
+{% with dict=jsonResponse template="treedict.html" %}
+ {% include template %}
+{% endwith %}
+</body>
+</html>

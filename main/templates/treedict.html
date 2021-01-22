@@ -1,0 +1,22 @@
+<ul>
+{% for key,val in dict.items %}
+ {% if val.items %}
+  <li>{{ key }} - {{val}}</li>
+  {%with dict=val template="treedict.html" %}
+   {%include template%}
+  {%endwith%}
+ {% elif val.0 %}
+  <li><a href="/api/texts/{{ val }}">{{ key }}</a></li>
+  {% if key == "heTitle" %}
+   <p>{{val}}</p>
+  {% endif %}
+   {% for v in val %}
+    {%with dict=v template="treedict.html" %}
+     {%include template%}
+    {%endwith%}
+   {%endfor%}
+  {% else %}
+<!--  <li>{{val}}</li>-->
+ {% endif %}
+{% endfor %}
+</ul>
