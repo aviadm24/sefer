@@ -5,17 +5,22 @@
     <title>Title</title>
 </head>
 <body>
-<p>chapter number: {{length}}</p>
-{% for num in range %}
-<a href="/api/texts/{{book}}/{{num}}">{{num}}</a>
-{%endfor%}
-
-<div dir="rtl">
-    {% for part in jsonResponse %}
-    <p>{{part}}</p>
+{%if error%}
+    <h2>{{error}}</h2>
+{%else%}
+    <h2>book: {{book}}</h2>
+    <p>chapter number: {{length}}</p>
+    {% for num in range %}
+    <a href="/api/texts/{{book}}/{{num}}">{{num}}</a>
     {%endfor%}
-</div>
-{% include "ycomment.html" %}
-{% include "add_comment_button.html" %}
+
+    <div dir="rtl">
+        {% for part in jsonResponse %}
+        <p>{{part}}</p>
+        {%endfor%}
+    </div>
+    {% include "ycomment.html" %}
+    {% include "add_comment_button.html" %}
+{%endif%}
 </body>
 </html>

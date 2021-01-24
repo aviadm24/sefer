@@ -36,22 +36,23 @@ def index(request, number=0):
                 # print(co.keys())
                 try:
                     subDict[co["heTitle"]] = co["title"].replace(' ', '_')
-                    # print('\t'+co["heTitle"])
+                    print('\t\t'+co["title"])
                 except:
                     # print('\t'+co["heCategory"])
-                    subDict[co["heCategory"]] = co["category"]
-        except KeyError:
+                    subDict[co["heCategory"]] = co["category"].replace(' ', '_')
+                    print('\t\t\t' + co["category"])
+        except KeyError:  # from dict(model.json[number]) number 3 and on
             try:
                 subDict[c["heTitle"]] = c["title"].replace(' ', '_')
-                # print('\t'+co["heTitle"])
+                print('\t'+c["title"])
             except:
                 # print('\t'+co["heCategory"])
-                subDict[c["heCategory"]] = c["category"]
+                subDict[c["heCategory"]] = c["category"].replace(' ', '_')
         try:
             mainDict[c["heCategory"]] = subDict
         except KeyError:
             mainDict[c["heTitle"]] = subDict
-    # print(mainDict)
+    print(mainDict)
 
     # print(type(jsonResponse))
 
@@ -88,8 +89,21 @@ def texts(request, slug=None, chapter=None):
         print("texts response all ready saved in db")
         model = Texts.objects.get(url=url)
     jsonResponse = dict(model.json)
-    print(jsonResponse.keys())
-    length = jsonResponse['length']
-    book = jsonResponse['book'].replace(' ', '_')
-    return render(request, "texts.html", {"jsonResponse": jsonResponse["he"], "length": length, "range": range(1, length+1),
-                                          'book': book})
+    print("keys: ", jsonResponse.keys())
+    try:
+        book = jsonResponse['book'].replace(' ', '_')
+        print(jsonResponse["he"])
+    except KeyError:
+        print("no book key in json response")
+    try:
+        length = jsonResponse['length']
+        return render(request, "texts.html",
+                      {"jsonResponse": jsonResponse["he"], "length": length, "range": range(1, length + 1),
+                       'book': book})
+    except KeyError:
+        print("no length key in json response")
+
+    if not jsonResponse["error"]:
+        return render(request, "texts.html", {"jsonResponse": jsonResponse["he"], 'book': book})
+    else:
+        return render(request, "texts.html", {'error': jsonResponse["error"], 'book': "no var book found"})
