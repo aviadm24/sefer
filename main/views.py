@@ -30,16 +30,27 @@ def index(request, number=0):
     mainDict = {}
     for c in jsonResponse["contents"]:
         subDict = {}
-        # print(c["heCategory"])
-        for co in c["contents"]:
-            # print(co.keys())
+        print(c.keys())
+        try:
+            for co in c["contents"]:
+                # print(co.keys())
+                try:
+                    subDict[co["heTitle"]] = co["title"].replace(' ', '_')
+                    # print('\t'+co["heTitle"])
+                except:
+                    # print('\t'+co["heCategory"])
+                    subDict[co["heCategory"]] = co["category"]
+        except KeyError:
             try:
-                subDict[co["heTitle"]] = co["title"].replace(' ', '_')
+                subDict[c["heTitle"]] = c["title"].replace(' ', '_')
                 # print('\t'+co["heTitle"])
             except:
                 # print('\t'+co["heCategory"])
-                subDict[co["heCategory"]] = co["category"]
-        mainDict[c["heCategory"]] = subDict
+                subDict[c["heCategory"]] = c["category"]
+        try:
+            mainDict[c["heCategory"]] = subDict
+        except KeyError:
+            mainDict[c["heTitle"]] = subDict
     # print(mainDict)
 
     # print(type(jsonResponse))
