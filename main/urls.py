@@ -17,6 +17,7 @@ from django.urls import path, include
 from . import views
 urlpatterns = [
     path('', views.index, name="index"),
+    path('index/<int:number>/', views.index, name="index"),
     path('titles', views.titles, name="titles"),
     path('api/texts/<slug:slug>/', views.texts),
     path('api/texts/<slug:slug>/<int:chapter>', views.texts),

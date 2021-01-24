@@ -7,7 +7,8 @@
 <body>
 <h1><a href="{% url 'titles' %}">titles</a></h1>
 {% for name in indexNames %}
-<a href="/api/texts/{{name.cat}}/">{{name.heCat}}</a>
+<!--<a href="/api/texts/{{name.cat}}/">{{name.heCat}}</a>-->
+<a href="/index/{{name.indexNum}}/">{{name.heCat}}</a>
 {%endfor%}
 
 {% with dict=jsonResponse template="treedict.html" %}

@@ -3,7 +3,8 @@ import requests
 from .models import Index, Texts
 
 
-def index(request):
+def index(request, number=0):
+    print("number: ", number)
     url = "http://www.sefaria.org/api/index"
     if not Index.objects.filter(url=url).exists():
         print("index response not saved in db")
@@ -17,14 +18,15 @@ def index(request):
         print("index response all ready saved in db")
         model = Index.objects.get(url=url)
     indexNames = []
-    for subJson in model.json:
+    for num, subJson in enumerate(model.json):
         catDict = {}
         print(subJson["heCategory"])
+        catDict['indexNum'] = num
         catDict['heCat'] = subJson["heCategory"]
         catDict['cat'] = subJson["category"]
         indexNames.append(catDict)
     print(indexNames)
-    jsonResponse = dict(model.json[1])
+    jsonResponse = dict(model.json[number])
     mainDict = {}
     for c in jsonResponse["contents"]:
         subDict = {}
