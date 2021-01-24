@@ -3,6 +3,54 @@ import requests
 from .models import Index, Texts
 
 
+def tree_parse(jsonDict=None, index=None, returnDict=None):
+    print("index: ", index)
+    index += 1
+    try:
+        if "contents" in jsonDict.keys():
+            tree_parse(jsonDict=jsonDict["contents"], index=index, returnDict=returnDict)
+    except (AttributeError, KeyError):
+        subDict= {}
+        if type(jsonDict)=="dict":
+            try:
+                subDict[jsonDict["heTitle"]] = jsonDict["title"].replace(' ', '_')
+                print('\t'*index + jsonDict["title"])
+            except KeyError:
+                # print('\t'+co["heCategory"])
+                subDict[jsonDict["heCategory"]] = jsonDict["category"].replace(' ', '_')
+                print('\t'*index + jsonDict["category"])
+            try:
+                returnDict[jsonDict["heCategory"]] = subDict
+            except KeyError:
+                returnDict[jsonDict["heTitle"]] = subDict
+        else:
+            for elem in jsonDict:
+                tree_parse(jsonDict=elem, index=index, returnDict=returnDict)
+                # try:
+                #     subDict[elem["heTitle"]] = elem["title"].replace(' ', '_')
+                #     print('\t' * index + jsonDict["title"])
+                # except KeyError:
+                #     # print('\t'+co["heCategory"])
+                #     subDict[elem["heCategory"]] = elem["category"].replace(' ', '_')
+                #     print('\t' * index + jsonDict["category"])
+                # try:
+                #     returnDict[elem["heCategory"]] = subDict
+                # except KeyError:
+                #     returnDict[elem["heTitle"]] = subDict
+    return returnDict
+
+
+def get_contents(sub_dict):
+    try:
+        for s in sub_dict["contents"]:
+            print('\t\t\t\t' + str(s.keys()))
+            get_contents(s)
+    except:
+        print('\t\t\t\t\t', sub_dict["title"])
+        print("sb: ", {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')})
+        return {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')}
+
+
 def index(request, number=0):
     print("number: ", number)
     url = "http://www.sefaria.org/api/index"
@@ -20,14 +68,16 @@ def index(request, number=0):
     indexNames = []
     for num, subJson in enumerate(model.json):
         catDict = {}
-        print(subJson["heCategory"])
+        # print(subJson["heCategory"])
         catDict['indexNum'] = num
         catDict['heCat'] = subJson["heCategory"]
         catDict['cat'] = subJson["category"]
         indexNames.append(catDict)
-    print(indexNames)
+    # print(indexNames)
     jsonResponse = dict(model.json[number])
     mainDict = {}
+    # index = 0
+    # mainDict = tree_parse(jsonDict=jsonResponse, index=index, returnDict=mainDict)
     for c in jsonResponse["contents"]:
         subDict = {}
         print(c.keys())
@@ -37,10 +87,22 @@ def index(request, number=0):
                 try:
                     subDict[co["heTitle"]] = co["title"].replace(' ', '_')
                     print('\t\t'+co["title"])
-                except:
+                except KeyError:
                     # print('\t'+co["heCategory"])
                     subDict[co["heCategory"]] = co["category"].replace(' ', '_')
                     print('\t\t\t' + co["category"])
+                except TypeError:
+                    try:
+                        sb = get_contents(co)
+                        print("sb: ", sb)
+                        subDict = sb
+                        # for i in co["contents"]:
+                        #     print('\t\t\t\t'+str(i.keys()))
+                        #     for ii in i["contents"]:
+                        #         print('\t\t\t\t\t', i.keys())
+                    except KeyError:
+                        pass
+
         except KeyError:  # from dict(model.json[number]) number 3 and on
             try:
                 subDict[c["heTitle"]] = c["title"].replace(' ', '_')
