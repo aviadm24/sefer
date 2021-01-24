@@ -65,9 +65,9 @@ def titles(request):
     # access JSOn content
     jsonResponse = dict(response.json())
     print("Entire JSON response")
-    print(jsonResponse)
+    print(jsonResponse.keys())
 
-    return render(request, "titles.html", {"jsonResponse": jsonResponse})
+    return render(request, "titles.html", {"jsonResponse": jsonResponse["books"]})
 
 
 def texts(request, slug=None, chapter=None):

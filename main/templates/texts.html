@@ -16,7 +16,7 @@
 
     <div dir="rtl">
         {% for part in jsonResponse %}
-        <p>{{part}}</p>
+        <p>{{part|safe}}</p>
         {%endfor%}
     </div>
     {% include "ycomment.html" %}
