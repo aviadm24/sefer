@@ -56,6 +56,28 @@ def get_contents(sub_dict):
         return {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')}
 
 
+def json_extract(obj, key):
+    """Recursively fetch values from nested JSON."""
+    arr = []
+
+    def extract(obj, arr, key):
+        """Recursively search for values of key in JSON tree."""
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if isinstance(v, (dict, list)):
+                    extract(v, arr, key)
+                elif k == key:
+                    arr.append(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                extract(item, arr, key)
+        return arr
+
+    values = extract(obj, arr, key)
+    return values
+
+
+
 def index(request, number=0):
     print("number: ", number)
     url = "http://www.sefaria.org/api/index"
@@ -83,53 +105,14 @@ def index(request, number=0):
     # index = 0
     # mainDict = tree_parse(jsonDict=jsonResponse, index=index, returnDict=mainDict)
     for c in jsonResponse["contents"]:
-        subDict = {}
-        subList = []
-        print(c.keys())
+        titles = json_extract(c, "title")
+        heTitles = json_extract(c, "heTitle")
+        subDict = dict(zip(heTitles, titles))
+        print(subDict)
         try:
-            for co in c["contents"]:
-                print(co.keys())
-                try:
-                    subDict[co["heTitle"]] = co["title"].replace(' ', '_')
-                    subList.append(subDict)
-                    print('\t\t'+co["title"])
-                except KeyError:
-                    # print('\t'+co["heCategory"])
-                    sb = get_contents(co)
-                    print("sb: ", sb)
-                    subDict = sb
-                    subList.append(subDict)
-                    # subDict[co["heCategory"]] = co["category"].replace(' ', '_')
-                    # print('\t\t\t' + co["category"])
-                except TypeError:
-                    try:
-                        sb = get_contents(co)
-                        print("sb: ", sb)
-                        subDict = sb
-                        subList.append(subDict)
-                        # for i in co["contents"]:
-                        #     print('\t\t\t\t'+str(i.keys()))
-                        #     for ii in i["contents"]:
-                        #         print('\t\t\t\t\t', i.keys())
-                    except KeyError:
-                        pass
-
-        except KeyError:  # from dict(model.json[number]) number 3 and on
-            try:
-                subDict[c["heTitle"]] = c["title"].replace(' ', '_')
-                print('\t'+c["title"])
-            except:
-                print('\tcategory:'+c["heCategory"])
-                subDict[c["heCategory"]] = c["category"].replace(' ', '_')
-        try:
-            mainDict[c["heCategory"]] = subList
-            print(len(subList))
+            mainDict[c["heCategory"]] = subDict
         except KeyError:
-            mainDict[c["heTitle"]] = subList
-    print(mainDict)
-
-    # print(type(jsonResponse))
-
+            mainDict[c["heTitle"]] = subDict
     return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames})
 
 
@@ -198,7 +181,7 @@ def texts(request, slug=None, chapter=None):
     print("keys: ", jsonResponse.keys())
     try:
         book = jsonResponse['book'].replace(' ', '_')
-        print(jsonResponse["he"])
+        # print(jsonResponse["he"])
     except KeyError:
         print("no book key in json response")
     try:
@@ -207,24 +190,31 @@ def texts(request, slug=None, chapter=None):
                       {"jsonResponse": jsonResponse["he"], "length": length, "range": range(1, length + 1),
                        'book': book})
     except KeyError:
+        length = jsonResponse['next']
+        print("sections: ", length)
+        return render(request, "texts.html",
+                      {"jsonResponse": jsonResponse["he"], "length": length, "range": range(1, length + 1),
+                       'book': book})
+    finally:
         print("no length key in json response")
 
-    if not jsonResponse["error"]:
-        return render(request, "texts.html", {"jsonResponse": jsonResponse["he"], 'book': book})
-    else:
-        url = "http://www.sefaria.org/api/index/{}".format(slug.replace('_', ' '))
-        print("url: ", url)
-        if not TitleMeta.objects.filter(url=url).exists():
-            print("index response not saved in db")
-            response = requests.get(url)
-            response.raise_for_status()
-            model = Index()
-            model.url = url
-            model.json = response.json()
-            model.save()
-        else:
-            print("index response all ready saved in db")
-            model = TitleMeta.objects.get(url=url)
-        jsonResponse = dict(model.json)
-        print("keys: ", jsonResponse.keys())
-        return render(request, "texts.html", {'error': jsonResponse["error"], 'book': "no var book found"})
+    # try:
+    print(jsonResponse.keys())
+    return render(request, "texts.html", {"jsonResponse": jsonResponse["he"], 'book': book})
+    # except:
+    #     url = "http://www.sefaria.org/api/index/{}".format(slug.replace('_', ' '))
+    #     print("url: ", url)
+    #     if not TitleMeta.objects.filter(url=url).exists():
+    #         print("index response not saved in db")
+    #         response = requests.get(url)
+    #         response.raise_for_status()
+    #         model = Index()
+    #         model.url = url
+    #         model.json = response.json()
+    #         model.save()
+    #     else:
+    #         print("index response all ready saved in db")
+    #         model = TitleMeta.objects.get(url=url)
+    #     jsonResponse = dict(model.json)
+    #     print("keys: ", jsonResponse.keys())
+    #     return render(request, "texts.html", {'error': jsonResponse["error"], 'book': "no var book found"})

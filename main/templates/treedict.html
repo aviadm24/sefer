@@ -1,7 +1,7 @@
 <ul>
 {% for key,val in dict.items %}
  {% if val.items %}
-  <li>{{ key }} - {{val}}</li>
+  <li>{{ key }}</li>
   {%with dict=val template="treedict.html" %}
    {%include template%}
   {%endwith%}
