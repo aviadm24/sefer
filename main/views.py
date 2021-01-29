@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import requests
-from .models import Index, Texts
+from .models import Index, Texts, TitleMeta
 
 
 def tree_parse(jsonDict=None, index=None, returnDict=None):
@@ -46,8 +46,12 @@ def get_contents(sub_dict):
             print('\t\t\t\t' + str(s.keys()))
             get_contents(s)
     except:
-        print('\t\t\t\t\t', sub_dict["title"])
-        print("sb: ", {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')})
+        try:
+            print('\t\t\t\t\t', sub_dict["title"])
+            print("sb: ", {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')})
+        except KeyError:
+            print("key error in :", sub_dict)
+            return {}
         return {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')}
 
 
@@ -80,22 +84,29 @@ def index(request, number=0):
     # mainDict = tree_parse(jsonDict=jsonResponse, index=index, returnDict=mainDict)
     for c in jsonResponse["contents"]:
         subDict = {}
+        subList = []
         print(c.keys())
         try:
             for co in c["contents"]:
-                # print(co.keys())
+                print(co.keys())
                 try:
                     subDict[co["heTitle"]] = co["title"].replace(' ', '_')
+                    subList.append(subDict)
                     print('\t\t'+co["title"])
                 except KeyError:
                     # print('\t'+co["heCategory"])
-                    subDict[co["heCategory"]] = co["category"].replace(' ', '_')
-                    print('\t\t\t' + co["category"])
+                    sb = get_contents(co)
+                    print("sb: ", sb)
+                    subDict = sb
+                    subList.append(subDict)
+                    # subDict[co["heCategory"]] = co["category"].replace(' ', '_')
+                    # print('\t\t\t' + co["category"])
                 except TypeError:
                     try:
                         sb = get_contents(co)
                         print("sb: ", sb)
                         subDict = sb
+                        subList.append(subDict)
                         # for i in co["contents"]:
                         #     print('\t\t\t\t'+str(i.keys()))
                         #     for ii in i["contents"]:
@@ -108,12 +119,13 @@ def index(request, number=0):
                 subDict[c["heTitle"]] = c["title"].replace(' ', '_')
                 print('\t'+c["title"])
             except:
-                # print('\t'+co["heCategory"])
+                print('\tcategory:'+c["heCategory"])
                 subDict[c["heCategory"]] = c["category"].replace(' ', '_')
         try:
-            mainDict[c["heCategory"]] = subDict
+            mainDict[c["heCategory"]] = subList
+            print(len(subList))
         except KeyError:
-            mainDict[c["heTitle"]] = subDict
+            mainDict[c["heTitle"]] = subList''
     print(mainDict)
 
     # print(type(jsonResponse))
@@ -168,4 +180,19 @@ def texts(request, slug=None, chapter=None):
     if not jsonResponse["error"]:
         return render(request, "texts.html", {"jsonResponse": jsonResponse["he"], 'book': book})
     else:
+        url = "http://www.sefaria.org/api/index/{}".format(slug.replace('_', ' '))
+        print("url: ", url)
+        if not TitleMeta.objects.filter(url=url).exists():
+            print("index response not saved in db")
+            response = requests.get(url)
+            response.raise_for_status()
+            model = Index()
+            model.url = url
+            model.json = response.json()
+            model.save()
+        else:
+            print("index response all ready saved in db")
+            model = TitleMeta.objects.get(url=url)
+        jsonResponse = dict(model.json)
+        print("keys: ", jsonResponse.keys())
         return render(request, "texts.html", {'error': jsonResponse["error"], 'book': "no var book found"})
