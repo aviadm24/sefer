@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import requests
-from .models import Index, Texts
+from .models import Index, Texts, MainCategories
+import json
 
 
 def index(request):
@@ -23,6 +24,8 @@ def index(request):
         catDict['heCat'] = subJson["heCategory"]
         catDict['cat'] = subJson["category"]
         indexNames.append(catDict)
+    # main_categories = MainCategories()
+    obj, created = MainCategories.objects.get_or_create(catJson=json.dumps(indexNames), url=url)
     print(indexNames)
     jsonResponse = dict(model.json[1])
     mainDict = {}
@@ -60,8 +63,40 @@ def texts(request, slug=None, chapter=None):
     print(slug)
     if chapter:
         url = "http://www.sefaria.org/api/texts/{}.{}".format(slug.replace('_', ' '), chapter)
+
     else:
         url = "http://www.sefaria.org/api/texts/{}".format(slug.replace('_', ' '))
+        catJson = MainCategories.objects.get(url="http://www.sefaria.org/api/index").catJson
+        indexNames = json.loads(catJson)
+        if slug in [d.values() for d in indexNames]:
+            if not Texts.objects.filter(url=url).exists():
+                print("texts response not saved in db")
+                response = requests.get(url)
+                response.raise_for_status()
+                model = Texts()
+                model.url = url
+                model.json = response.json()
+                model.save()
+            else:
+                print("texts response all ready saved in db")
+                model = Texts.objects.get(url=url)
+            jsonResponse = dict(model.json[0])
+            print("res: ", jsonResponse)
+            mainDict = {}
+            for c in jsonResponse["contents"]:
+                subDict = {}
+                # print(c["heCategory"])
+                for co in c["contents"]:
+                    # print(co.keys())
+                    try:
+                        subDict[co["heTitle"]] = co["title"].replace(' ', '_')
+                        # print('\t'+co["heTitle"])
+                    except:
+                        # print('\t'+co["heCategory"])
+                        subDict[co["heCategory"]] = co["category"]
+                mainDict[c["heCategory"]] = subDict
+            return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames})
+
     print(url)
     if not Texts.objects.filter(url=url).exists():
         print("texts response not saved in db")
