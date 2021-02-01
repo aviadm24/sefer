@@ -9,6 +9,7 @@
     <h2>{{error}}</h2>
 {%else%}
     <h2>book: {{book}}</h2>
+    <p>next: <a href="/api/texts/{{next}}?pad=0">{{next}}</a></p>
     <p>chapter number: {{length}}</p>
     {% for num in range %}
     <a href="/api/texts/{{book}}/{{num}}">{{num}}</a>
