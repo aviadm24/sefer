@@ -27,3 +27,11 @@ class TitleMeta(models.Model):
 
 # class Ycomment(models.Model):
 #     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCAD)
+
+
+class MainCategories(models.Model):
+    catJson = models.JSONField()
+    url = models.URLField(max_length=200)
+
+    def __str__(self):
+        return self.cat
