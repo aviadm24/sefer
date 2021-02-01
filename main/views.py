@@ -125,7 +125,7 @@ def index(request, number=0):
             mainDict[c["heCategory"]] = subList
             print(len(subList))
         except KeyError:
-            mainDict[c["heTitle"]] = subList''
+            mainDict[c["heTitle"]] = subList
     print(mainDict)
 
     # print(type(jsonResponse))
