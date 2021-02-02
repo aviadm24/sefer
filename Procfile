@@ -1,0 +1,1 @@
+web: gunicorn sefaria_django.wsgi

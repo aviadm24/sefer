@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Index, Texts, MainCategories
+from .models import Index, Texts, MainCategories, Ycomment
 
 
 class IndexAdmin(admin.ModelAdmin):
@@ -13,6 +13,12 @@ class TextsAdmin(admin.ModelAdmin):
 class MainCategoriesAdmin(admin.ModelAdmin):
     pass
 
+
+class YcommentAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(Index, IndexAdmin)
 admin.site.register(Texts, TextsAdmin)
 admin.site.register(MainCategories, MainCategoriesAdmin)
+admin.site.register(Ycomment, YcommentAdmin)

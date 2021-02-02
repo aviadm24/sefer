@@ -1,7 +1,26 @@
 from django.shortcuts import render
 import requests
 from .models import Index, Texts, MainCategories, TitleMeta, Links
+from .forms import YcommentForm
 import json
+from django.http import HttpResponseRedirect
+from django.http import JsonResponse
+
+
+def add_comment(request):
+    form = YcommentForm()
+    if request.method == "POST":
+        print("post: ", request.POST)
+        form = YcommentForm(request.POST)  # if no files
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.user = request.user
+            obj.save()
+            return JsonResponse({"msg": "comment successfully saved.", "user_name": request.user.username})
+        else:
+            return JsonResponse({"msg": "comment not saved.", "user_name": request.user.username})
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def json_extract(obj, key):
@@ -40,6 +59,14 @@ def get_model(Model, url):
     return model
 
 
+def get_json_field_or_empty_string(json, field):
+    try:
+        val = json[field]
+    except KeyError:
+        val = ''
+    return val
+
+
 def index(request, number=0):
     print("number: ", number)
     url = "http://www.sefaria.org/api/index"
@@ -76,24 +103,32 @@ def index(request, number=0):
 
 
 def titles(request):
-    response = requests.get("http://www.sefaria.org/api/index/titles")
-    response.raise_for_status()
-    # access JSOn content
-    jsonResponse = dict(response.json())
+    url = "http://www.sefaria.org/api/index/titles"
+    model = get_model(Index, url)
+    jsonResponse = dict(model.json)
     print("Entire JSON response")
     print(jsonResponse.keys())
     return render(request, "titles.html", {"jsonResponse": jsonResponse["books"]})
 
 
-def texts(request, slug=None, chapter=None):
-    print(slug)
+def texts(request, slug=None, chapter=None, comment=None):
+    form = YcommentForm()
+    linksToPass = []
     if chapter:
         url = "http://www.sefaria.org/api/texts/{}.{}".format(slug.replace('_', ' '), chapter)
         link_url = "http://www.sefaria.org/api/links/{}.{}".format(slug.replace('_', ' '), chapter)
         link_model = get_model(Links, link_url)
-        jsonResponse = dict(link_model.json[0])
-        print("linkes: ", jsonResponse)
+        links_list = link_model.json
 
+        for link in links_list:
+            linkdDictToPass = {}
+            linkDict = dict(link)
+            linkdDictToPass['sourceRef'] = linkDict['sourceRef']
+            linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
+            linksToPass.append((linkdDictToPass))
+        print("linkes: ", links_list[1])
+    elif comment:
+        url = "http://www.sefaria.org/api/texts/{}/{}".format(slug.replace('_', ' '), comment)
     else:
         url = "http://www.sefaria.org/api/texts/{}".format(slug.replace('_', ' '))
         catJson = MainCategories.objects.get(url="http://www.sefaria.org/api/index").catJson
@@ -115,7 +150,7 @@ def texts(request, slug=None, chapter=None):
                         # print('\t'+co["heCategory"])
                         subDict[co["heCategory"]] = co["category"]
                 mainDict[c["heCategory"]] = subDict
-            return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames})
+            return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames, "form": form})
 
     print(url)
     model = get_model(Texts, url)
@@ -127,32 +162,23 @@ def texts(request, slug=None, chapter=None):
     except KeyError:
         print("no book key in json response")
     try:
+        try:
+            next = jsonResponse['next']
+            next = next.split(':')[0]
+            print('next: ', next)
+        except (KeyError, AttributeError):
+            next='no next page'
         length = jsonResponse['length']
         return render(request, "texts.html",
-                      {"jsonResponse": jsonResponse["he"], "length": length, "range": range(1, length + 1),
-                       'book': book})
+                      {"jsonResponse": jsonResponse["he"], "next": next, "length": length, "range": range(1, length + 1),
+                       'book': book, 'links': linksToPass, "form": form})
     except KeyError:
-        next = jsonResponse['next']
-        next = next.split(':')[0]
-        print('next: ', next)
-
+        try:
+            next = jsonResponse['next']
+            next = next.split(':')[0]
+            print('next: ', next)
+        except KeyError:
+            next=''
+        print(jsonResponse.keys())
         return render(request, "texts.html",
-                      {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next})
-    # try:
-    # except:
-    #     url = "http://www.sefaria.org/api/index/{}".format(slug.replace('_', ' '))
-    #     print("url: ", url)
-    #     if not TitleMeta.objects.filter(url=url).exists():
-    #         print("index response not saved in db")
-    #         response = requests.get(url)
-    #         response.raise_for_status()
-    #         model = Index()
-    #         model.url = url
-    #         model.json = response.json()
-    #         model.save()
-    #     else:
-    #         print("index response all ready saved in db")
-    #         model = TitleMeta.objects.get(url=url)
-    #     jsonResponse = dict(model.json)
-    #     print("keys: ", jsonResponse.keys())
-    #     return render(request, "texts.html", {'error': jsonResponse["error"], 'book': "no var book found"})
+                      {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'links': linksToPass, "form": form})

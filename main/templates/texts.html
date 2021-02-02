@@ -1,27 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{%if error%}
-    <h2>{{error}}</h2>
-{%else%}
-    <h2>book: {{book}}</h2>
-    <p>next: <a href="/api/texts/{{next}}?pad=0">{{next}}</a></p>
-    <p>chapter number: {{length}}</p>
-    {% for num in range %}
-    <a href="/api/texts/{{book}}/{{num}}">{{num}}</a>
-    {%endfor%}
+{% extends "base.html" %}
 
-    <div dir="rtl">
-        {% for part in jsonResponse %}
-        <p>{{part|safe}}</p>
+{% block content %}
+
+    {%if error%}
+        <h2>{{error}}</h2>
+    {%else%}
+        <h2>book: {{book}}</h2>
+        <p>next: <a href="/api/texts/{{next}}?pad=0">{{next}}</a></p>
+        <p>chapter number: {{length}}</p>
+        {% for num in range %}
+        <a href="/api/texts/{{book}} {{num}}">{{num}}</a>
         {%endfor%}
-    </div>
-    {% include "ycomment.html" %}
-    {% include "add_comment_button.html" %}
-{%endif%}
-</body>
-</html>
+
+        <div dir="rtl">
+            {% for part in jsonResponse %}
+            <p>{{part|safe}}</p>
+            {%endfor%}
+        </div>
+            {% for link in links %}
+            <a href="{{link.sourceRef}}">{{link.sourceHeRef}}</a>
+            {%endfor%}
+        <div id="links">
+
+        </div>
+        {% include "ycomment.html" %}
+        {% include "add_comment_button.html" %}
+    {%endif%}
+
+{% endblock %}
