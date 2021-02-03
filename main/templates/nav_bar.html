@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+
+    <form class="form-inline" action="/search/">
+        <input class="form-control mr-sm-2" type="text" placeholder="Search">
+        <button class="btn btn-success" type="submit">Search</button>
+    </form>
+
+    <li class="nav">
+        <a class="nav-link" href="/admin/">admin</a>
+    </li>
+    <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'account_logout' %}">Logout</a></li>
+            {% else %}
+             <li><a href="{% url 'account_login' %}">Login</a></li> |
+             <li><a href="{% url 'account_signup' %}">Signup</a></li>
+            {% endif %}
+    </ul>
+    <li class="nav">
+        <a class="nav-link" href="/logout/">log out</a>
+    </li>
+    <li class="nav">
+        <a class="nav-link" href="/comment/">comment</a>
+    </li>
+
+    <!-- Dropdown -->
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+        Dropdown link
+        </a>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="#">Link 1</a>
+            <a class="dropdown-item" href="#">Link 2</a>
+            <a class="dropdown-item" href="#">Link 3</a>
+        </div>
+    </li>
+</nav>
+
+
