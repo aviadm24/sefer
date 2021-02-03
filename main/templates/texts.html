@@ -1,30 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <a href="/">main page</a>
-    {%if error%}
-        <h2>{{error}}</h2>
-    {%else%}
-        <h2>book: {{book}}</h2>
-        <p>next: <a href="/api/texts/{{next}}?pad=0">{{next}}</a></p>
-        <p>chapter number: {{length}}</p>
-        {% for num in range %}
-        <a href="/api/texts/{{book}} {{num}}">{{num}}</a>
+    <div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+      <div class="sidebar-heading">Start Bootstrap </div>
+      <div class="list-group list-group-flush">
+        {% for link in links %}
+        <a class="list-group-item list-group-item-action bg-light" href="&{{link.sourceRef}}">{{link.sourceHeRef}}</a>
         {%endfor%}
+      </div>
+    </div>
+    <!-- /#sidebar-wrapper -->
 
-        <div dir="rtl">
-            {% for part in jsonResponse %}
-            <p>{{part|safe}}</p>
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+        <button class="btn btn-primary" id="menu-toggle">Toggle Menu</button>
+
+
+      <div class="container-fluid">
+        {%if error%}
+            <h2>{{error}}</h2>
+        {%else%}
+            <h2>book: {{book}}</h2>
+            <p>next: <a href="/api/texts/{{next}}?pad=0">{{next}}</a></p>
+            <p>chapter number: {{length}}</p>
+            {% for num in range %}
+            <a href="/api/texts/{{book}}.{{num}}">{{num}}</a>
             {%endfor%}
-        </div>
-            {% for link in links %}
-            <a href="{{link.sourceRef}}">{{link.sourceHeRef}}</a>
-            {%endfor%}
-        <div id="links">
 
-        </div>
-        {% include "ycomment.html" %}
-        {% include "add_comment_button.html" %}
-    {%endif%}
+            <div dir="rtl">
+                {% for part in jsonResponse %}
+                <div class="text-right">{{part|safe}}</div>
+                {%endfor%}
+            </div>
+            <div id="links">
 
+            </div>
+            {% include "ycomment.html" %}
+            {% include "add_comment_button.html" %}
+        {%endif%}
+
+
+      </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
 {% endblock %}

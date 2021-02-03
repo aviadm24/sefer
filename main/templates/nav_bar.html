@@ -4,7 +4,9 @@
         <input class="form-control mr-sm-2" type="text" placeholder="Search">
         <button class="btn btn-success" type="submit">Search</button>
     </form>
-
+    <li class="nav">
+        <a class="nav-link" href="/">home</a>
+    </li>
     <li class="nav">
         <a class="nav-link" href="/admin/">admin</a>
     </li>
@@ -16,22 +18,23 @@
              <li><a href="{% url 'account_signup' %}">Signup</a></li>
             {% endif %}
     </ul>
+
     <li class="nav">
-        <a class="nav-link" href="/logout/">log out</a>
+        <a class="nav-link" href="{% url 'titles' %}">all titles</a>
     </li>
     <li class="nav">
         <a class="nav-link" href="/comment/">comment</a>
     </li>
 
     <!-- Dropdown -->
-    <li class="nav-item dropdown">
+    <li class="nav dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
         Dropdown link
         </a>
         <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Link 1</a>
-            <a class="dropdown-item" href="#">Link 2</a>
-            <a class="dropdown-item" href="#">Link 3</a>
+            {% for name in indexNames %}
+                <a class="dropdown-item" href="/index/{{name.indexNum}}/">{{name.heCat}}</a>
+            {%endfor%}
         </div>
     </li>
 </nav>
