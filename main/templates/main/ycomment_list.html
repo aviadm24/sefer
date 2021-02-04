@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>הערות</h1>
+    <ul>
+    {% for comment in object_list %}
+        <li>{{ comment.updated_at|date }} - {{ comment.comment }}</li>
+    {% empty %}
+        <li>No articles yet.</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

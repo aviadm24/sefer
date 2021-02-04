@@ -16,7 +16,7 @@ function getCookie(name) {
     const csrftoken = getCookie('csrftoken');
 
     // Setting the Click Event Listener on the Submit Button
-    $('[type="submit"]').on('click', function (e) {
+    $('#add_comment_form').on('click', function (e) {
         e.preventDefault()
         // Making the AJAX Request
         console.log("url: "+$("#id_url")[0].value)

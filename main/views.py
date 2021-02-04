@@ -1,11 +1,27 @@
 from django.shortcuts import render
 import requests
-from .models import Index, Texts, MainCategories, TitleMeta, Links
+from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment
 from .forms import YcommentForm
 import json
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
+from django.utils import timezone
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 
+
+class YcommentListView(ListView):
+
+    model = Ycomment
+    paginate_by = 100  # if pagination is desired
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        return context
+
+    def get_queryset(self):
+        return Ycomment.objects.filter(user=self.request.user)
 
 def add_comment(request):
     form = YcommentForm()
@@ -96,6 +112,18 @@ def get_correct_page_range(primary_category, length):
         return range(1, length + 1)
 
 
+def get_next_prev(jsonResponse):
+    try:
+        next = jsonResponse['next']
+        print("next: ", next)
+        prev = jsonResponse['prev']
+        print("prev: ", prev)
+    except (KeyError, AttributeError):
+        next = 'no next page'
+        prev = 'no prev page'
+    return next, prev
+
+
 def index(request, number=0):
     print("number: ", number)
     url = "http://www.sefaria.org/api/index"
@@ -120,8 +148,6 @@ def index(request, number=0):
             mainDict[c["heCategory"]] = subDict
         except KeyError:
             mainDict[c["heTitle"]] = subDict
-    # print(mainDict)
-
     return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames})
 
 
@@ -145,7 +171,7 @@ def texts(request, slug=None, chapter=None, comment=None):
         jsonResponse = dict(model.json)
         print("res: ", jsonResponse.keys())
         for s in ['ref', 'heRef', 'order', 'sections', 'heSectionRef', 'sectionRef']:
-            print(s," - ", jsonResponse[s])
+            print(s, " - ", jsonResponse[s])
         link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
         link_model = get_model(Links, link_url)
         links_list = link_model.json
@@ -157,62 +183,23 @@ def texts(request, slug=None, chapter=None, comment=None):
             linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
             linksToPass.append((linkdDictToPass))
         print("linkes: ", len(links_list))
-    # elif comment:
-    #     url = "http://www.sefaria.org/api/texts/{}".format(comment)
-    # else:
-    #     url = "http://www.sefaria.org/api/texts/{}".format(slug.replace('_', ' '))
-    #     catJson = MainCategories.objects.get(url="http://www.sefaria.org/api/index").catJson
-    #     indexNames = json.loads(catJson)
-        # if slug in [d.values() for d in indexNames]:
-
-        # mainDict = {}
-        # for c in jsonResponse["contents"]:
-        #     subDict = {}
-        #     # print(c["heCategory"])
-        #     for co in c["contents"]:
-        #         # print(co.keys())
-        #         try:
-        #             subDict[co["heTitle"]] = co["title"].replace(' ', '_')
-        #         except:
-        #             subDict[co["heCategory"]] = co["category"]
-        #     mainDict[c["heCategory"]] = subDict
-        # indexNames = get_index_names()
-        # return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames, "form": form, "indexNames": indexNames})
-
-    # print(url)
-    # model = get_model(Texts, url)
-    # jsonResponse = dict(model.json)
-    # print("keys: ", jsonResponse.keys())
-    # print('primary_category: ', jsonResponse['primary_category'])
         try:
             book = jsonResponse['book'].replace(' ', '_')
-            # print(jsonResponse["he"])
         except KeyError:
             print("no book key in json response")
         try:
-            try:
-                next = jsonResponse['next']
-                next = next.split(':')[0]
-                print('next: ', next)
-            except (KeyError, AttributeError):
-                next='no next page'
-
+            next, prev = get_next_prev(jsonResponse)
             length = jsonResponse['length']
             page_range = get_correct_page_range(jsonResponse['primary_category'], length)
             indexNames = get_index_names()
             return render(request, "texts.html",
-                          {"jsonResponse": jsonResponse["he"], "next": next, "length": length,
+                          {"jsonResponse": jsonResponse["he"], "next": next, 'prev': prev, "length": length,
                            "range": page_range, 'book': book, 'links': linksToPass, "form": form,
                            "indexNames": indexNames})
         except KeyError:
-            try:
-                next = jsonResponse['next']
-                next = next.split(':')[0]
-                print('next: ', next)
-            except KeyError:
-                next=''
+            next, prev = get_next_prev(jsonResponse)
             print(jsonResponse.keys())
             indexNames = get_index_names()
             return render(request, "texts.html",
-                          {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'links': linksToPass,
+                          {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
                            "form": form, "indexNames": indexNames})

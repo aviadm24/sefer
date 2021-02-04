@@ -1,15 +1,11 @@
-def get_correct_page_range(primary_category, length):
-    page_list = []
-    if primary_category == "Talmud":
-        last_num = 0
-        for num in range(2, int(length+2)//2+1):
-            last_num = num
-            page_list.append(str(num)+'a')
-            page_list.append(str(num) + 'b')
-        if length % 2 != 0:
-            page_list.append(str(last_num+1) + 'a')
+import requests
 
-        print(len(page_list))
+url = 'https://www.sefaria.org/api/search-wrapper'
+myobj = {
+    "query": "משה",
+    "type": "text"
+}
 
+x = requests.post(url, data=myobj)
 
-get_correct_page_range("Talmud", 125)
+print(x.text)
