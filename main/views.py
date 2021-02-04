@@ -135,12 +135,12 @@ def titles(request):
 
 
 def texts(request, slug=None, chapter=None, comment=None):
-
     print("slug: ", slug)
     form = YcommentForm()
     linksToPass = []
     if slug:
         url = "http://www.sefaria.org/api/texts/{}".format(slug)
+        print(url)
         model = get_model(Texts, url)
         jsonResponse = dict(model.json)
         print("res: ", jsonResponse.keys())
@@ -165,54 +165,54 @@ def texts(request, slug=None, chapter=None, comment=None):
     #     indexNames = json.loads(catJson)
         # if slug in [d.values() for d in indexNames]:
 
-        mainDict = {}
-        for c in jsonResponse["contents"]:
-            subDict = {}
-            # print(c["heCategory"])
-            for co in c["contents"]:
-                # print(co.keys())
-                try:
-                    subDict[co["heTitle"]] = co["title"].replace(' ', '_')
-                except:
-                    subDict[co["heCategory"]] = co["category"]
-            mainDict[c["heCategory"]] = subDict
-        indexNames = get_index_names()
-        return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames, "form": form, "indexNames": indexNames})
+        # mainDict = {}
+        # for c in jsonResponse["contents"]:
+        #     subDict = {}
+        #     # print(c["heCategory"])
+        #     for co in c["contents"]:
+        #         # print(co.keys())
+        #         try:
+        #             subDict[co["heTitle"]] = co["title"].replace(' ', '_')
+        #         except:
+        #             subDict[co["heCategory"]] = co["category"]
+        #     mainDict[c["heCategory"]] = subDict
+        # indexNames = get_index_names()
+        # return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames, "form": form, "indexNames": indexNames})
 
     # print(url)
     # model = get_model(Texts, url)
     # jsonResponse = dict(model.json)
     # print("keys: ", jsonResponse.keys())
     # print('primary_category: ', jsonResponse['primary_category'])
-    # try:
-    #     book = jsonResponse['book'].replace(' ', '_')
-    #     # print(jsonResponse["he"])
-    # except KeyError:
-    #     print("no book key in json response")
-    # try:
-    #     try:
-    #         next = jsonResponse['next']
-    #         next = next.split(':')[0]
-    #         print('next: ', next)
-    #     except (KeyError, AttributeError):
-    #         next='no next page'
-    #
-    #     length = jsonResponse['length']
-    #     page_range = get_correct_page_range(jsonResponse['primary_category'], length)
-    #     indexNames = get_index_names()
-    #     return render(request, "texts.html",
-    #                   {"jsonResponse": jsonResponse["he"], "next": next, "length": length,
-    #                    "range": page_range, 'book': book, 'links': linksToPass, "form": form,
-    #                    "indexNames": indexNames})
-    # except KeyError:
-    #     try:
-    #         next = jsonResponse['next']
-    #         next = next.split(':')[0]
-    #         print('next: ', next)
-    #     except KeyError:
-    #         next=''
-    #     print(jsonResponse.keys())
-    #     indexNames = get_index_names()
-    #     return render(request, "texts.html",
-    #                   {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'links': linksToPass,
-    #                    "form": form, "indexNames": indexNames})
+        try:
+            book = jsonResponse['book'].replace(' ', '_')
+            # print(jsonResponse["he"])
+        except KeyError:
+            print("no book key in json response")
+        try:
+            try:
+                next = jsonResponse['next']
+                next = next.split(':')[0]
+                print('next: ', next)
+            except (KeyError, AttributeError):
+                next='no next page'
+
+            length = jsonResponse['length']
+            page_range = get_correct_page_range(jsonResponse['primary_category'], length)
+            indexNames = get_index_names()
+            return render(request, "texts.html",
+                          {"jsonResponse": jsonResponse["he"], "next": next, "length": length,
+                           "range": page_range, 'book': book, 'links': linksToPass, "form": form,
+                           "indexNames": indexNames})
+        except KeyError:
+            try:
+                next = jsonResponse['next']
+                next = next.split(':')[0]
+                print('next: ', next)
+            except KeyError:
+                next=''
+            print(jsonResponse.keys())
+            indexNames = get_index_names()
+            return render(request, "texts.html",
+                          {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'links': linksToPass,
+                           "form": form, "indexNames": indexNames})
