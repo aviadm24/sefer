@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'main',
-
+    'ocr',
     'django.contrib.sites',
     'allauth',
     'allauth.account',

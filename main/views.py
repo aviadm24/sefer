@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import requests
 from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment
-from .forms import YcommentForm
+from .forms import YcommentForm, FileUploadForm
 import json
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -18,10 +18,22 @@ class YcommentListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['now'] = timezone.now()
+        form = FileUploadForm()
+        context['form'] = form
         return context
 
     def get_queryset(self):
         return Ycomment.objects.filter(user=self.request.user)
+
+
+def add_file(request):
+    form = FileUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+    else:
+        pass
+    return redirect('ycomment-list')
+
 
 def add_comment(request):
     form = YcommentForm()
@@ -160,7 +172,7 @@ def titles(request):
     return render(request, "titles.html", {"jsonResponse": jsonResponse["books"]})
 
 
-def texts(request, slug=None, chapter=None, comment=None):
+def texts(request, slug=None):
     print("slug: ", slug)
     form = YcommentForm()
     linksToPass = []
