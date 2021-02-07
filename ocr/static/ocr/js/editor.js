@@ -28,5 +28,12 @@ $('.newPost button[data-func]').click(function(){
       localStorage.removeItem("wysiwyg");
     });
 
+    $('button[data-func="edit"]').click(function(){
+      var text = $('#uploaded_text').innerHTML;
+      console.log(text);
+      $('.editor').html(text);
+      localStorage.removeItem("wysiwyg");
+    });
+
 
   }

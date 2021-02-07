@@ -90,7 +90,7 @@ def image_upload(request):
 
     if request.method == 'POST' and request.FILES['image']:
         file = request.FILES['image']
-        if file.name.endswith("png"):
+        try:
             handler = Image.open(file)
             encoded_string = base64.b64encode(file.read()).decode('utf8')
             # print(encoded_string)
@@ -98,7 +98,7 @@ def image_upload(request):
                 text = plain_ocr(handler, 'heb')
             except:
                 text = ''
-        else:
+        except:
             text = file.read().decode('utf8')
             print("text: ", text)
             encoded_string = ''

@@ -10,20 +10,16 @@
     <li class="nav">
         <a class="nav-link" href="/admin/">admin</a>
     </li>
-    <ul class="nav navbar-nav navbar-right">
-            {% if user.is_authenticated %}
-            <li><a href="{% url 'account_logout' %}">Logout</a></li>
-            {% else %}
-             <li><a href="{% url 'account_login' %}">Login</a></li> |
-             <li><a href="{% url 'account_signup' %}">Signup</a></li>
-            {% endif %}
-    </ul>
+
 
     <li class="nav">
-        <a class="nav-link" href="{% url 'titles' %}">all titles</a>
+        <a class="nav-link" href="{% url 'titles' %}">כל שמות הספרים</a>
     </li>
     <li class="nav">
         <a class="nav-link" href="/profile/">איזור אישי</a>
+    </li>
+    <li class="nav">
+        <a class="nav-link" href="{% url 'upload' %}">העלאת תמונות</a>
     </li>
 
     <!-- Dropdown -->
@@ -37,6 +33,17 @@
             {%endfor%}
         </div>
     </li>
+
+    <ul class="nav navbar-nav navbar-right">
+        {% if user.is_authenticated %}
+        <li class="nav"><a>שלום: {{request.user}}</a></li>
+        <li><a href="{% url 'account_logout' %}">Logout</a></li>
+        {% else %}
+         <li><a href="{% url 'account_login' %}">Login</a></li> |
+         <li><a href="{% url 'account_signup' %}">Signup</a></li>
+        {% endif %}
+    </ul>
+
 </nav>
 
 

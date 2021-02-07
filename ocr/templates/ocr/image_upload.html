@@ -13,18 +13,18 @@
     <input type="file" name="image">
     <button type="submit">Upload</button>
     </form>
-
+        <div id="uploaded_text">
           {% if text %}
           {% autoescape off %}
             <p>{{ text|linebreaks }}</p>
           {% endautoescape %}
           {% endif %}
-
+        </div>
     <div>
-    <p>Taken from wikpedia</p>
-        <img src="data:image/png;base64, {{base64}}" alt="Red dot" />
+    <p></p>
+        <img src="data:image/png;base64, {{base64}}" alt="" />
     </div>
-    {% include editor.html %}
+    {% include "main/editor.html" %}
 </div>
 {% endblock %}
 
