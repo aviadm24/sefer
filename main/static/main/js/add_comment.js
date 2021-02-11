@@ -26,6 +26,7 @@ function getCookie(name) {
             data: {
                 comment: $("#id_comment")[0].value,
                 url: $("#id_url")[0].value,
+                comment_reference: $("#id_comment_reference")[0].value,
             },
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);

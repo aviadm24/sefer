@@ -6,11 +6,11 @@ from .models import Ycomment, Yfiles
 class YcommentForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(YcommentForm, self).__init__(*args, **kwargs)
-        # self.fields['url'].widget.attrs = {'value': '{{request.get_full_path}}', }
+        self.fields['comment'].widget.attrs = {'dir': 'auto'}
 
     class Meta:
         model = Ycomment
-        fields = ['comment']  # , 'url'
+        fields = ['comment', 'comment_reference', 'url']  # , 'url'
         # widgets = {'url': forms.URLField(attrs={'value': '{{request.get_full_path}}'} )
         #            }
 

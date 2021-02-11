@@ -3,10 +3,7 @@
     <p id="error" style="display: none">your comment was saved successfully</p>
     <form method="post" >
         {% csrf_token %}
-        <label>url:</label>
-        <input id="id_url" type="text" value="{{request.get_full_path}}" readonly>
         {{ form.as_p }}
-
     </form>
     <input id="add_comment_form" type="submit" class="button blue" value="Send">
 </div>

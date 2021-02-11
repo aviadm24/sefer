@@ -41,6 +41,7 @@ def add_comment(request):
         print("post: ", request.POST)
         form = YcommentForm(request.POST)  # if no files
         if form.is_valid():
+            print("form: ", form.cleaned_data)
             obj = form.save(commit=False)
             obj.user = request.user
             obj.save()
@@ -177,6 +178,12 @@ def texts(request, slug=None):
     form = YcommentForm()
     linksToPass = []
     if slug:
+        if request.user.is_authenticated:
+            user_comments = Ycomment.objects.filter(user=request.user).filter(url=request.build_absolute_uri())
+            print("current url: ", request.build_absolute_uri())
+            print("user_comments: ", user_comments)
+        else:
+            user_comments = []
         url = "http://www.sefaria.org/api/texts/{}".format(slug)
         print(url)
         model = get_model(Texts, url)
@@ -207,11 +214,11 @@ def texts(request, slug=None):
             return render(request, "texts.html",
                           {"jsonResponse": jsonResponse["he"], "next": next, 'prev': prev, "length": length,
                            "range": page_range, 'book': book, 'links': linksToPass, "form": form,
-                           "indexNames": indexNames})
+                           "indexNames": indexNames, "user_comments": user_comments})
         except KeyError:
             next, prev = get_next_prev(jsonResponse)
             print(jsonResponse.keys())
             indexNames = get_index_names()
             return render(request, "texts.html",
                           {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
-                           "form": form, "indexNames": indexNames})
+                           "form": form, "indexNames": indexNames, "user_comments": user_comments})
