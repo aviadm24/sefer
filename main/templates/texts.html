@@ -2,14 +2,7 @@
 
 {% block content %}
     <div class="d-flex" id="wrapper">
-    <!-- search -->
-    <div class="bg-light border-right" id="sidebar-search">
-      <div class="sidebar-heading">תוצאות חיפוש</div>
-      <div id="search_results" class="list-group list-group-flush">
 
-      </div>
-    </div>
-    <!-- /#sidebar-search -->
     <!-- Sidebar -->
     <div class="bg-light border-right" id="sidebar-wrapper">
       <div class="sidebar-heading">מפרשים</div>
@@ -53,6 +46,7 @@
             <h3>חידושים והערות</h3>
             {% for comment in user_comments %}
             <div class="text-right">{{comment.user}}</div>
+            <div class="text-right comment_reference">{{comment.comment_reference}}</div>
             <div class="text-right">{{comment.updated_at}}</div>
             <div class="text-right">{{comment.comment|safe}}</div>
             {%endfor%}
@@ -61,7 +55,14 @@
       </div>
     </div>
     <!-- /#page-content-wrapper -->
+    <!-- search -->
+    <div class="bg-light border-right" id="sidebar-search">
+      <div class="sidebar-heading">תוצאות חיפוש</div>
+      <div id="search_results" class="list-group list-group-flush">
 
+      </div>
+    </div>
+    <!-- /#sidebar-search -->
   </div>
   <!-- /#wrapper -->
 {% endblock %}
