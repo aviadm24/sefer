@@ -1,8 +1,5 @@
 from django.shortcuts import render, redirect
 import requests
-<<<<<<< HEAD
-from .models import Index, Texts, TitlesMeta
-=======
 from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment
 from .forms import YcommentForm, FileUploadForm
 import json
@@ -11,7 +8,6 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
->>>>>>> 08f90f3fbad0b27abff1d08da64f54ecfbfff766
 
 
 class YcommentListView(ListView):
