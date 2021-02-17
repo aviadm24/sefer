@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import requests
-from .models import Index, Texts
+from .models import Index, Texts, TitlesMeta
 
 
 def tree_parse(jsonDict=None, index=None, returnDict=None):
@@ -168,4 +168,10 @@ def texts(request, slug=None, chapter=None):
     if not jsonResponse["error"]:
         return render(request, "texts.html", {"jsonResponse": jsonResponse["he"], 'book': book})
     else:
+        url = "http://www.sefaria.org/index/{}".format(slug.replace('_', ' '))
+        response = requests.get(url)
+        response.raise_for_status()
+        model = TitlesMeta()
+        model.url = url
+        model.json = response.json()
         return render(request, "texts.html", {'error': jsonResponse["error"], 'book': "no var book found"})
