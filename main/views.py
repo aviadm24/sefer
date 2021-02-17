@@ -1,177 +1,228 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import requests
+<<<<<<< HEAD
 from .models import Index, Texts, TitlesMeta
+=======
+from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment
+from .forms import YcommentForm, FileUploadForm
+import json
+from django.http import HttpResponseRedirect
+from django.http import JsonResponse
+from django.utils import timezone
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
+>>>>>>> 08f90f3fbad0b27abff1d08da64f54ecfbfff766
 
 
-def tree_parse(jsonDict=None, index=None, returnDict=None):
-    print("index: ", index)
-    index += 1
-    try:
-        if "contents" in jsonDict.keys():
-            tree_parse(jsonDict=jsonDict["contents"], index=index, returnDict=returnDict)
-    except (AttributeError, KeyError):
-        subDict= {}
-        if type(jsonDict)=="dict":
-            try:
-                subDict[jsonDict["heTitle"]] = jsonDict["title"].replace(' ', '_')
-                print('\t'*index + jsonDict["title"])
-            except KeyError:
-                # print('\t'+co["heCategory"])
-                subDict[jsonDict["heCategory"]] = jsonDict["category"].replace(' ', '_')
-                print('\t'*index + jsonDict["category"])
-            try:
-                returnDict[jsonDict["heCategory"]] = subDict
-            except KeyError:
-                returnDict[jsonDict["heTitle"]] = subDict
+class YcommentListView(ListView):
+
+    model = Ycomment
+    paginate_by = 100  # if pagination is desired
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        form = FileUploadForm()
+        context['form'] = form
+        return context
+
+    def get_queryset(self):
+        return Ycomment.objects.filter(user=self.request.user)
+
+
+def add_file(request):
+    form = FileUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+        form.save()
+    else:
+        pass
+    return redirect('ycomment-list')
+
+
+def add_comment(request):
+    form = YcommentForm()
+    if request.method == "POST":
+        print("post: ", request.POST)
+        form = YcommentForm(request.POST)  # if no files
+        if form.is_valid():
+            print("form: ", form.cleaned_data)
+            obj = form.save(commit=False)
+            obj.user = request.user
+            obj.save()
+            return JsonResponse({"msg": "comment successfully saved.", "user_name": request.user.username})
         else:
-            for elem in jsonDict:
-                tree_parse(jsonDict=elem, index=index, returnDict=returnDict)
-                # try:
-                #     subDict[elem["heTitle"]] = elem["title"].replace(' ', '_')
-                #     print('\t' * index + jsonDict["title"])
-                # except KeyError:
-                #     # print('\t'+co["heCategory"])
-                #     subDict[elem["heCategory"]] = elem["category"].replace(' ', '_')
-                #     print('\t' * index + jsonDict["category"])
-                # try:
-                #     returnDict[elem["heCategory"]] = subDict
-                # except KeyError:
-                #     returnDict[elem["heTitle"]] = subDict
-    return returnDict
+            return JsonResponse({"msg": "comment not saved.", "user_name": request.user.username})
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def get_contents(sub_dict):
-    try:
-        for s in sub_dict["contents"]:
-            print('\t\t\t\t' + str(s.keys()))
-            get_contents(s)
-    except:
-        print('\t\t\t\t\t', sub_dict["title"])
-        print("sb: ", {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')})
-        return {sub_dict["heTitle"]: sub_dict["title"].replace(' ', '_')}
+def json_extract(obj, key):
+    """Recursively fetch values from nested JSON."""
+    arr = []
+
+    def extract(obj, arr, key):
+        """Recursively search for values of key in JSON tree."""
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if isinstance(v, (dict, list)):
+                    extract(v, arr, key)
+                elif k == key:
+                    arr.append(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                extract(item, arr, key)
+        return arr
+
+    values = extract(obj, arr, key)
+    return values
 
 
-def index(request, number=0):
-    print("number: ", number)
-    url = "http://www.sefaria.org/api/index"
-    if not Index.objects.filter(url=url).exists():
+def get_model(Model, url):
+    if not Model.objects.filter(url=url).exists():
         print("index response not saved in db")
         response = requests.get(url)
         response.raise_for_status()
-        model = Index()
+        model = Model()
         model.url = url
         model.json = response.json()
         model.save()
     else:
         print("index response all ready saved in db")
-        model = Index.objects.get(url=url)
+        model = Model.objects.get(url=url)
+    return model
+
+
+def get_json_field_or_empty_string(json, field):
+    try:
+        val = json[field]
+    except KeyError:
+        val = ''
+    return val
+
+
+def get_index_names(model=None):
+    if not model:
+        model = get_model(Index, "http://www.sefaria.org/api/index")
     indexNames = []
     for num, subJson in enumerate(model.json):
         catDict = {}
-        # print(subJson["heCategory"])
         catDict['indexNum'] = num
         catDict['heCat'] = subJson["heCategory"]
         catDict['cat'] = subJson["category"]
         indexNames.append(catDict)
-    # print(indexNames)
+    return indexNames
+
+
+def get_correct_page_range(primary_category, length):
+    page_list = []
+    if primary_category == "Talmud":
+        last = 0
+        for num in range(2, int(length+2)//2+1):
+            page_list.append(str(num)+'a')
+            page_list.append(str(num)+'b')
+            last = num
+        if length % 2 != 0:
+            page_list.append(str(last+1) + 'a')
+
+        return page_list
+    else:
+        return range(1, length + 1)
+
+
+def get_next_prev(jsonResponse):
+    try:
+        next = jsonResponse['next']
+        print("next: ", next)
+        prev = jsonResponse['prev']
+        print("prev: ", prev)
+    except (KeyError, AttributeError):
+        next = 'no next page'
+        prev = 'no prev page'
+    return next, prev
+
+
+def index(request, number=0):
+    print("number: ", number)
+    url = "http://www.sefaria.org/api/index"
+    model = get_model(Index, url)
+    indexNames = get_index_names(model=model)
+    if not MainCategories.objects.filter(url=url).exists():
+        mainCategories = MainCategories()
+        mainCategories.url = url
+        mainCategories.catJson = json.dumps(indexNames)
+        mainCategories.save()
+
     jsonResponse = dict(model.json[number])
     mainDict = {}
     # index = 0
     # mainDict = tree_parse(jsonDict=jsonResponse, index=index, returnDict=mainDict)
     for c in jsonResponse["contents"]:
-        subDict = {}
-        print(c.keys())
-        try:
-            for co in c["contents"]:
-                # print(co.keys())
-                try:
-                    subDict[co["heTitle"]] = co["title"].replace(' ', '_')
-                    print('\t\t'+co["title"])
-                except KeyError:
-                    # print('\t'+co["heCategory"])
-                    subDict[co["heCategory"]] = co["category"].replace(' ', '_')
-                    print('\t\t\t' + co["category"])
-                except TypeError:
-                    try:
-                        sb = get_contents(co)
-                        print("sb: ", sb)
-                        subDict = sb
-                        # for i in co["contents"]:
-                        #     print('\t\t\t\t'+str(i.keys()))
-                        #     for ii in i["contents"]:
-                        #         print('\t\t\t\t\t', i.keys())
-                    except KeyError:
-                        pass
-
-        except KeyError:  # from dict(model.json[number]) number 3 and on
-            try:
-                subDict[c["heTitle"]] = c["title"].replace(' ', '_')
-                print('\t'+c["title"])
-            except:
-                # print('\t'+co["heCategory"])
-                subDict[c["heCategory"]] = c["category"].replace(' ', '_')
+        titles = json_extract(c, "title")
+        heTitles = json_extract(c, "heTitle")
+        subDict = dict(zip(heTitles, titles))
+        # print(subDict)
         try:
             mainDict[c["heCategory"]] = subDict
         except KeyError:
             mainDict[c["heTitle"]] = subDict
-    print(mainDict)
-
-    # print(type(jsonResponse))
-
     return render(request, "index.html", {"jsonResponse": mainDict, "indexNames": indexNames})
 
 
 def titles(request):
-    response = requests.get("http://www.sefaria.org/api/index/titles")
-    response.raise_for_status()
-    # access JSOn content
-    jsonResponse = dict(response.json())
+    url = "http://www.sefaria.org/api/index/titles"
+    model = get_model(Index, url)
+    jsonResponse = dict(model.json)
     print("Entire JSON response")
     print(jsonResponse.keys())
-
     return render(request, "titles.html", {"jsonResponse": jsonResponse["books"]})
 
 
-def texts(request, slug=None, chapter=None):
-    print(slug)
-    if chapter:
-        url = "http://www.sefaria.org/api/texts/{}.{}".format(slug.replace('_', ' '), chapter)
-    else:
-        url = "http://www.sefaria.org/api/texts/{}".format(slug.replace('_', ' '))
-    print(url)
-    if not Texts.objects.filter(url=url).exists():
-        print("texts response not saved in db")
-        response = requests.get(url)
-        response.raise_for_status()
-        model = Texts()
-        model.url = url
-        model.json = response.json()
-        model.save()
-    else:
-        print("texts response all ready saved in db")
-        model = Texts.objects.get(url=url)
-    jsonResponse = dict(model.json)
-    print("keys: ", jsonResponse.keys())
-    try:
-        book = jsonResponse['book'].replace(' ', '_')
-        print(jsonResponse["he"])
-    except KeyError:
-        print("no book key in json response")
-    try:
-        length = jsonResponse['length']
-        return render(request, "texts.html",
-                      {"jsonResponse": jsonResponse["he"], "length": length, "range": range(1, length + 1),
-                       'book': book})
-    except KeyError:
-        print("no length key in json response")
+def texts(request, slug=None):
+    print("slug: ", slug)
+    form = YcommentForm()
+    linksToPass = []
+    if slug:
+        if request.user.is_authenticated:
+            user_comments = Ycomment.objects.filter(user=request.user).filter(url=request.build_absolute_uri())
+            print("current url: ", request.build_absolute_uri())
+            print("user_comments: ", user_comments)
+        else:
+            user_comments = []
+        url = "http://www.sefaria.org/api/texts/{}".format(slug)
+        print(url)
+        model = get_model(Texts, url)
+        jsonResponse = dict(model.json)
+        print("res: ", jsonResponse.keys())
+        for s in ['ref', 'heRef', 'order', 'sections', 'heSectionRef', 'sectionRef']:
+            print(s, " - ", jsonResponse[s])
+        link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
+        link_model = get_model(Links, link_url)
+        links_list = link_model.json
 
-    if not jsonResponse["error"]:
-        return render(request, "texts.html", {"jsonResponse": jsonResponse["he"], 'book': book})
-    else:
-        url = "http://www.sefaria.org/index/{}".format(slug.replace('_', ' '))
-        response = requests.get(url)
-        response.raise_for_status()
-        model = TitlesMeta()
-        model.url = url
-        model.json = response.json()
-        return render(request, "texts.html", {'error': jsonResponse["error"], 'book': "no var book found"})
+        for link in links_list:
+            linkdDictToPass = {}
+            linkDict = dict(link)
+            linkdDictToPass['sourceRef'] = linkDict['sourceRef']
+            linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
+            linksToPass.append((linkdDictToPass))
+        print("linkes: ", len(links_list))
+        try:
+            book = jsonResponse['book'].replace(' ', '_')
+        except KeyError:
+            print("no book key in json response")
+        try:
+            next, prev = get_next_prev(jsonResponse)
+            length = jsonResponse['length']
+            page_range = get_correct_page_range(jsonResponse['primary_category'], length)
+            indexNames = get_index_names()
+            return render(request, "texts.html",
+                          {"jsonResponse": jsonResponse["he"], "next": next, 'prev': prev, "length": length,
+                           "range": page_range, 'book': book, 'links': linksToPass, "form": form,
+                           "indexNames": indexNames, "user_comments": user_comments})
+        except KeyError:
+            next, prev = get_next_prev(jsonResponse)
+            print(jsonResponse.keys())
+            indexNames = get_index_names()
+            return render(request, "texts.html",
+                          {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
+                           "form": form, "indexNames": indexNames, "user_comments": user_comments})

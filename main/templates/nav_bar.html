@@ -1,0 +1,49 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+
+    <form class="form-inline" action="/search/">
+        <input id="search_word" class="form-control mr-sm-2" type="text" placeholder="Search">
+        <button id="search_form" class="btn btn-success" type="submit">Search</button>
+    </form>
+    <li class="nav">
+        <a class="nav-link" href="/">home</a>
+    </li>
+    <li class="nav">
+        <a class="nav-link" href="/admin/">admin</a>
+    </li>
+
+
+    <li class="nav">
+        <a class="nav-link" href="{% url 'titles' %}">כל שמות הספרים</a>
+    </li>
+    <li class="nav">
+        <a class="nav-link" href="/profile/">איזור אישי</a>
+    </li>
+    <li class="nav">
+        <a class="nav-link" href="{% url 'upload' %}">העלאת תמונות</a>
+    </li>
+
+    <!-- Dropdown -->
+    <li class="nav dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+        מקורות
+        </a>
+        <div class="dropdown-menu">
+            {% for name in indexNames %}
+                <a class="dropdown-item" href="/index/{{name.indexNum}}/">{{name.heCat}}</a>
+            {%endfor%}
+        </div>
+    </li>
+
+    <ul class="nav navbar-nav navbar-right">
+        {% if user.is_authenticated %}
+        <li class="nav"><a>שלום: {{request.user}}</a></li>
+        <li><a href="{% url 'account_logout' %}">Logout</a></li>
+        {% else %}
+         <li><a href="{% url 'account_login' %}">Login</a></li> |
+         <li><a href="{% url 'account_signup' %}">Signup</a></li>
+        {% endif %}
+    </ul>
+
+</nav>
+
+

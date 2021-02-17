@@ -19,8 +19,8 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('index/<int:number>/', views.index, name="index"),
     path('titles/', views.titles, name="titles"),
-    re_path(r'^api/texts/(?P<slug>[a-zA-Z,_ ]*)/$', views.texts),
-    path('api/texts/<slug:slug>/', views.texts),
-    re_path(r'^api/texts/(?P<slug>[a-zA-Z,_ ]*)/(?P<chapter>[0-9]*)$', views.texts),
-    path('api/texts/<slug:slug>/<int:chapter>', views.texts),
+    re_path(r"^api/texts/(?P<slug>[a-zA-Z0-9,'_:. +]*)/$", views.texts),
+    path('profile/', views.YcommentListView.as_view(), name='ycomment-list'),
+    path('add_comment/', views.add_comment),
+    path('add_file/', views.add_file),
 ]

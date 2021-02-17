@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div>
+    <a href="/">Return to home</a>
+    <button id="getparams">get parameters</button>
+    <button id="merge">get merge</button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image">
+    <button type="submit">Upload</button>
+    </form>
+        <div id="uploaded_text">
+          {% if text %}
+          {% autoescape off %}
+            <p>{{ text|linebreaks }}</p>
+          {% endautoescape %}
+          {% endif %}
+        </div>
+    <div>
+    <p></p>
+        <img src="data:image/png;base64, {{base64}}" alt="" />
+    </div>
+    {% include "main/editor.html" %}
+</div>
+{% endblock %}
+
+
+
