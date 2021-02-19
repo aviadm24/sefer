@@ -1,3 +1,7 @@
+String.prototype.replaceAt = function(indexStart, indexEnd, replacement) {
+    return this.substr(0, indexStart) + replacement + this.substr(indexEnd);
+}
+
 
 function highlight(comment_reference, indexStart, indexEnd) { // https://stackoverflow.com/questions/52743841/find-and-highlight-word-in-text-using-js
   var paragraph = document.getElementById('text');
@@ -5,16 +9,24 @@ function highlight(comment_reference, indexStart, indexEnd) { // https://stackov
   var divChildren = paragraph.childNodes;
   $("#text").children().each(function(){
   search = comment_reference.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); //https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
-  console.log($(this).html())
+//  console.log($(this).html())
   var opar = $(this).html();
   var re = new RegExp(search, 'g');
   var m;
   var matches = opar.matchAll(re)
   for (const match of matches) {
-  console.log("offset: "+ match.off)
-      console.log(`Found ${match[0]} start=${match.index} end=${match.index + match[0].length}.`);
+//  console.log("offset: "+ match.off)
+      if(indexStart > indexEnd){
+        var start = indexStart;
+        indexStart = indexEnd;
+        indexEnd = start;
+      }
+      console.log(indexStart+':'+typeof indexStart);
+      console.log(match.index+':'+typeof match.index);
+      console.log(`Found ${match[0]} start=${match.index} end=${match.index + match[0].length} equal=${indexStart==match.index}.`);
       if (indexStart == match.index) {
-        var newInnerHTML = opar.replace(re, `<span class='highlight'>$&</span>`);
+        var newInnerHTML = opar.replaceAt(indexStart, indexEnd,  `<span class='highlight'>${match[0]}</span>`)
+//        var newInnerHTML = opar.replace(re, `<span class='highlight'>$&</span>`);
 //        var newInnerHTML = opar.replace(re, `<mark>$&</mark>`);
         $(this).html(newInnerHTML);
 //       innerHTML = opar.substring(0,indexStart) + "<span class='highlight'>" + opar.substring(indexStart,indexEnd) + "</span>" + opar.substring(indexEnd);
@@ -47,7 +59,13 @@ function highlight(comment_reference, indexStart, indexEnd) { // https://stackov
 //        console.log(content, content.indexOf(selectedtext), content.indexOf(selectedtext)+selectedtext.length)
 //    }
 //},false);
+document.onselectionchange = function() {
+    let {anchorNode, anchorOffset, focusNode, focusOffset} = document.getSelection();
 
+//    console.log(`${anchorNode && anchorNode.data}:${anchorOffset}`);
+//    console.log(`${focusNode && focusNode.data}:${focusOffset}`);
+//    console.log(`${anchorOffset}:${focusOffset}`);
+  };
 
 $( document ).ready(function() {
   $(".comment_reference").each(function(){
@@ -85,6 +103,9 @@ $("#text").mouseup(function(){
             content = content.replace(/^\s*|\s*$/, '');
         }
     console.log(content.indexOf(selectedtext), content.indexOf(selectedtext)+selectedtext.length)
-   $('#id_comment_reference').val(selectedText+'/'+content.indexOf(selectedtext)+'/'+(content.indexOf(selectedtext)+selectedtext.length));
+    let {anchorNode, anchorOffset, focusNode, focusOffset} = document.getSelection();
+    console.log(`${anchorOffset}:${focusOffset}`);
+//   $('#id_comment_reference').val(selectedText+'/'+content.indexOf(selectedtext)+'/'+(content.indexOf(selectedtext)+selectedtext.length));
+   $('#id_comment_reference').val(selectedText+'/'+anchorOffset+'/'+focusOffset);
   // https://stackoverflow.com/questions/9756941/knowing-the-text-selected-using-mouse-in-javascript
 });
