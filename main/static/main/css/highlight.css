@@ -8,3 +8,7 @@
     background-color: #fff2ac;
     background-image: linear-gradient(to right, #ffe359 0%, #fff2ac 100%);
 }
+
+.vl {
+  border-left: 6px solid green;
+}

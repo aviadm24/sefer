@@ -52,6 +52,16 @@ def add_comment(request):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+def is_authenticated(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            return JsonResponse({"msg": "true", "user_name": request.user.username})
+        else:
+            return JsonResponse({"msg": "false"})
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 def json_extract(obj, key):
     """Recursively fetch values from nested JSON."""
     arr = []
@@ -177,13 +187,15 @@ def texts(request, slug=None):
     print("slug: ", slug)
     form = YcommentForm()
     linksToPass = []
+    user_comments = []
+    all_comments = []
     if slug:
         if request.user.is_authenticated:
             user_comments = Ycomment.objects.filter(user=request.user).filter(url=request.build_absolute_uri())
             print("current url: ", request.build_absolute_uri())
             print("user_comments: ", user_comments)
         else:
-            user_comments = []
+            all_comments = Ycomment.objects.all()
         url = "http://www.sefaria.org/api/texts/{}".format(slug)
         print(url)
         model = get_model(Texts, url)
@@ -214,11 +226,11 @@ def texts(request, slug=None):
             return render(request, "texts.html",
                           {"jsonResponse": jsonResponse["he"], "next": next, 'prev': prev, "length": length,
                            "range": page_range, 'book': book, 'links': linksToPass, "form": form,
-                           "indexNames": indexNames, "user_comments": user_comments})
+                           "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
         except KeyError:
             next, prev = get_next_prev(jsonResponse)
             print(jsonResponse.keys())
             indexNames = get_index_names()
             return render(request, "texts.html",
                           {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
-                           "form": form, "indexNames": indexNames, "user_comments": user_comments})
+                           "form": form, "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
