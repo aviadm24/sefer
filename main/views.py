@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 import requests
 from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment
 from .forms import YcommentForm, FileUploadForm
@@ -50,6 +50,17 @@ def add_comment(request):
             return JsonResponse({"msg": "comment not saved.", "user_name": request.user.username})
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def remove_comment(request, id=0):
+    print("id: ", id)
+    comment = get_object_or_404(Ycomment, pk=id)  # Get your current cat
+
+    if request.method == 'GET':  # If method is POST,
+        comment.delete()  # delete the cat.
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'), {"msg": "comment deleted successfully"})
 
 
 def is_authenticated(request):

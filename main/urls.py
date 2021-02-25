@@ -21,7 +21,8 @@ urlpatterns = [
     path('titles/', views.titles, name="titles"),
     re_path(r"^api/texts/(?P<slug>[a-zA-Z0-9,'_:. +]*)/$", views.texts),
     path('profile/', views.YcommentListView.as_view(), name='ycomment-list'),
-    path('add_comment/', views.add_comment),
+    path('add_comment/', views.add_comment, name="add_comment"),
+    path('remove_comment/<int:id>/', views.remove_comment, name="remove_comment"),
     path('is_authenticated/', views.is_authenticated),
     path('add_file/', views.add_file),
 ]
