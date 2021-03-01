@@ -2,7 +2,7 @@ String.prototype.replaceAt = function(indexStart, indexEnd, replacement) {
     return this.substr(0, indexStart) + replacement + this.substr(indexEnd);
 }
 String.prototype.splice = function(idx, rem, str) {
-    return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+    return this.slice(0, idx) + "<span class='highlight'>&</span>" + this.slice(idx);
 };
 
 function highlight(comment_text, indexStart, indexEnd) { // https://stackoverflow.com/questions/52743841/find-and-highlight-word-in-text-using-js
