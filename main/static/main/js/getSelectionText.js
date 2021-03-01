@@ -2,17 +2,22 @@ String.prototype.replaceAt = function(indexStart, indexEnd, replacement) {
     return this.substr(0, indexStart) + replacement + this.substr(indexEnd);
 }
 String.prototype.splice = function(idx, rem, str) {
-    return this.slice(0, idx) + "<span class='highlight'>&</span>" + this.slice(idx);
+    console.log(this.slice(0, idx));
+    console.log(str);
+    console.log(this.slice(idx));
+    return this.slice(0, idx) + str + this.slice(idx);
 };
 
-function highlight(comment_text, indexStart, indexEnd) { // https://stackoverflow.com/questions/52743841/find-and-highlight-word-in-text-using-js
+function highlight(comment_text, indexStart, indexEnd, nodeIndex) { // https://stackoverflow.com/questions/52743841/find-and-highlight-word-in-text-using-js
   var paragraph = document.getElementById('text');
   var divChildren = paragraph.childNodes;
+  var indexOfNode = -1;
   $("#text").children().each(function(){
-    //  console.log($(this).html())
+      indexOfNode++;
+//      console.log("indexOfNode: "+indexOfNode);
       var opar = $(this).html();
-      if (comment_text == ""){
-        var result = opar.splice(indexStart, 0, '<div class="vl"></div>');
+      if (comment_text == "" & indexOfNode==nodeIndex){  //
+        var result = opar.splice(indexStart, 0, "<span class='highlight'>&</span>");
         $(this).html(result);
       }else{
         var search = comment_text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); //https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
@@ -50,7 +55,8 @@ $( document ).ready(function() {
     text = comment_reference.split('/')[0];
     indexStart = comment_reference.split('/')[1];
     indexEnd = comment_reference.split('/')[2];
-    highlight(text, indexStart, indexEnd);
+    nodeIndex = comment_reference.split('/')[3];
+    highlight(text, indexStart, indexEnd, nodeIndex);
   })
 });
 
@@ -71,8 +77,14 @@ $("#text").mouseup(function(){
         document.selection.createRange().text;
     } else return;
 //    var selectedtext = window.getSelection().toString();
-//    var range = window.getSelection().getRangeAt(0);
-//    var content = range.startContainer.textContent;
+    var range = window.getSelection().getRangeAt(0);
+    var node = range.startContainer.parentNode;
+    console.log(node);
+    var content = range.startContainer.textContent;
+    var parentNode = node.parentNode;
+    console.log(parentNode);
+    var index = Array.prototype.indexOf.call(parentNode.children, node);
+    console.log("index " + index);
 //    content = content.replace(/(?:\r\n|\r|\n)/g, '');
 //        if(range.startContainer.parentElement.tagName=="BODY")
 //        {
@@ -83,7 +95,7 @@ $("#text").mouseup(function(){
 //        console.log(content.indexOf(selectedtext), content.indexOf(selectedtext)+selectedtext.length)
     let {anchorNode, anchorOffset, focusNode, focusOffset} = document.getSelection();
     console.log(`${anchorOffset}:${focusOffset}`);
-    $('#id_comment_reference').val(selectedText+'/'+anchorOffset+'/'+focusOffset);
+    $('#id_comment_reference').val(selectedText+'/'+anchorOffset+'/'+focusOffset+'/'+index);
     var c = document.getElementById("add_comment");
     c.style.display = "block";
     $("#id_url").val(document.URL);

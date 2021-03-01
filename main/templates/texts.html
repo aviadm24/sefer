@@ -49,6 +49,8 @@
             <div class="text-right comment_reference">{{comment.comment_reference}}</div>
             <div class="text-right">{{comment.updated_at}}</div>
             <div class="text-right">{{comment.comment|safe}}</div>
+            <div class="text-right" hidden>{{comment.id}}</div>
+            <a type="button" href="/remove_comment/{{comment.id}}">remove</a>
             {%endfor%}
 
         </div>
