@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path, include, re_path
 from . import views
 urlpatterns = [
-    path('', views.index, name="index"),
+    path('', views.home, name="home"),
     path('index/<int:number>/', views.index, name="index"),
     path('titles/', views.titles, name="titles"),
     re_path(r"^api/texts/(?P<slug>[a-zA-Z0-9,'_:. +]*)/$", views.texts),

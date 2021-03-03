@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+    <p dir="rtl">בחר אחד מהמקורות להוסיף עליהם הערה</p>
+     {% with dict=jsonResponse template="index_buttons.html" %}
+     {% include template %}
+    {% endwith %}
+
+    </div>
+{% endblock %}

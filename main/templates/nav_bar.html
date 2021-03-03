@@ -1,24 +1,29 @@
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center">
 
     <form class="form-inline" action="/search/">
         <input id="search_word" class="form-control mr-sm-2" type="text" placeholder="Search">
         <button id="search_form" class="btn btn-success" type="submit">Search</button>
     </form>
-    <li class="nav">
+    <ul class="navbar-nav navbar-right">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navb" aria-expanded="true">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse show" id="navd">
+    <li class="nav-item">
         <a class="nav-link" href="/">home</a>
     </li>
-    <li class="nav">
+    <li class="nav-item">
         <a class="nav-link" href="/admin/">admin</a>
     </li>
 
 
-    <li class="nav">
+    <li class="nav-item">
         <a class="nav-link" href="{% url 'titles' %}">כל שמות הספרים</a>
     </li>
-    <li class="nav">
+    <li class="nav-item">
         <a class="nav-link" href="/profile/">איזור אישי</a>
     </li>
-    <li class="nav">
+    <li class="nav-item">
         <a class="nav-link" href="{% url 'upload' %}">העלאת תמונות</a>
     </li>
 
@@ -34,15 +39,26 @@
         </div>
     </li>
 
-    <ul class="nav navbar-nav navbar-right">
-        {% if user.is_authenticated %}
-        <li class="nav"><a>שלום: {{request.user}}</a></li>
-        <li><a href="{% url 'account_logout' %}">Logout</a></li>
-        {% else %}
-         <li><a href="{% url 'account_login' %}">Login</a></li> |
-         <li><a href="{% url 'account_signup' %}">Signup</a></li>
-        {% endif %}
+
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        <a class="nav-link">שלום: {{request.user}}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'account_logout' %}">Logout</a>
+    </li>
+    {% else %}
+     <li class="nav-item">
+         <a class="nav-link" href="{% url 'account_login' %}">Login</a>
+     </li>
+     <li class="nav-item">
+         <a class="nav-link" href="{% url 'account_signup' %}">Signup</a>
+     </li>
+    {% endif %}
+    </div>
     </ul>
+
+
 
 </nav>
 

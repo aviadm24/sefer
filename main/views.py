@@ -158,6 +158,18 @@ def get_next_prev(jsonResponse):
     return next, prev
 
 
+def home(request):
+    url = "http://www.sefaria.org/api/index"
+    model = get_model(Index, url)
+    indexNames = get_index_names(model=model)
+    if not MainCategories.objects.filter(url=url).exists():
+        mainCategories = MainCategories()
+        mainCategories.url = url
+        mainCategories.catJson = json.dumps(indexNames)
+        mainCategories.save()
+    return render(request, "home.html", {"indexNames": indexNames})
+
+
 def index(request, number=0):
     print("number: ", number)
     url = "http://www.sefaria.org/api/index"
