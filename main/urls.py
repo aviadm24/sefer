@@ -25,4 +25,6 @@ urlpatterns = [
     path('remove_comment/<int:id>/', views.remove_comment, name="remove_comment"),
     path('is_authenticated/', views.is_authenticated),
     path('add_file/', views.add_file),
+    path('contact/', views.contact),
+    path('about/', views.about),
 ]

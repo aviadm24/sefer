@@ -257,3 +257,11 @@ def texts(request, slug=None):
             return render(request, "texts.html",
                           {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
                            "form": form, "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
+
+
+def contact(request):
+    return render(request, "main/contact.html", {})
+
+
+def about(request):
+    return render(request, "main/about.html", {})

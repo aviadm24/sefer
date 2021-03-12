@@ -15,7 +15,9 @@
 </head>
 <body>
 {% include 'testNav.html' %}
-{% block content %}{% endblock %}
+<div class="flex-fill">
+    {% block content %}{% endblock %}
+</div>
 
 {% include 'footer.html' %}
 <!-- jQuery library -->

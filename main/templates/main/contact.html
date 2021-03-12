@@ -1,0 +1,68 @@
+{% extends "main/base.html" %}
+{% block content %}
+  <!-- Contact Us Section -->
+    <section class="Material-contact-section section-padding section-dark">
+      <div class="container">
+          <div class="row">
+              <!-- Section Titile -->
+              <div class="col-md-12 wow animated fadeInLeft" data-wow-delay=".2s">
+                  <h1 class="section-title">נשמח לשמוע את דעתכם</h1>
+              </div>
+          </div>
+          <div class="row">
+              <!-- Section Titile -->
+              <div class="col-md-6 mt-3 contact-widget-section2 wow animated fadeInLeft" data-wow-delay=".2s">
+                <p>האתר שם למטרה לתת את מירב העזרה ללומדים לכן נשמח לקבל הערות, הארות ובקשות לשיפור</p>
+
+                <div class="find-widget">
+                 מיקום:  <a href="https://hostriver.ro">בית שאן</a>
+                </div>
+                <div class="find-widget">
+                 כתובת: <a href="#">שאול המלך 98/7</a>
+                </div>
+                <div class="find-widget">
+                  פלא':  <a href="#">972-54-757-3120+</a>
+                </div>
+                <div class="find-widget">
+                   זמנים: <a href="#">ראשון - חמישי 12:00 - 13:00</a>
+                </div>
+              </div>
+              <!-- contact form -->
+              <div class="col-md-6 wow animated fadeInRight" data-wow-delay=".2s">
+                  <form class="shake" role="form" action="/send" method="post" id="contactForm" name="contact-form" data-toggle="validator">
+                      <!-- Name -->
+                      <div class="form-group label-floating">
+                        <label class="control-label" for="name">שם</label>
+                        <input class="form-control" id="name" type="text" name="name" required data-error="Please enter your name">
+                        <div class="help-block with-errors"></div>
+                      </div>
+                      <!-- email -->
+                      <div class="form-group label-floating">
+                        <label class="control-label" for="email">מייל</label>
+                        <input class="form-control" id="email" type="email" name="email" required data-error="Please enter your Email">
+                        <div class="help-block with-errors"></div>
+                      </div>
+                      <!-- Subject -->
+                      <div class="form-group label-floating">
+                        <label class="control-label">נושא</label>
+                        <input class="form-control" id="msg_subject" type="text" name="subject" required data-error="Please enter your message subject">
+                        <div class="help-block with-errors"></div>
+                      </div>
+                      <!-- Message -->
+                      <div class="form-group label-floating">
+                          <label for="message" class="control-label">הודעה</label>
+                          <textarea class="form-control" rows="3" id="message" name="message" required data-error="Write your message"></textarea>
+                          <div class="help-block with-errors"></div>
+                      </div>
+                      <!-- Form Submit -->
+                      <div class="form-submit mt-5">
+                          <button class="btn btn-primary" type="submit" id="form-submit"><i class="material-icons mdi mdi-message-outline"></i>שלח הודעה</button>
+                          <div id="msgSubmit" class="h3 text-center hidden"></div>
+                          <div class="clearfix"></div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+    </section>
+{% endblock %}
