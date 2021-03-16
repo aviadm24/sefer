@@ -1,7 +1,7 @@
 {% extends "main/base.html" %}
 
 {% block content %}
-    <div class="container">
+    <div class="container resizable">
     <p dir="rtl">בחר אחד מהמקורות להוסיף עליהם הערה</p>
      {% with dict=jsonResponse template="treeTest.html" %}
      {% include template %}

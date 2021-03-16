@@ -1,44 +1,35 @@
 {% extends "main/base.html" %}
+{% load static %}
 {% block content %}
 <section class="Material-contact-section section-padding section-dark">
-      <div class="container">
+  <div class="container">
           <div class="row">
               <!-- Section Titile -->
               <div class="col-md-12 wow animated fadeInLeft" data-wow-delay=".2s">
-                  <h1 class="section-title">נשמח לשמוע את דעתכם</h1>
+                  <h1 class="section-title">הצוות שלנו</h1>
               </div>
           </div>
           <div class="row">
-
-
-  <div class="column">
-    <div class="card">
-      <img src="/w3images/team1.jpg" alt="Jane" style="width:100%">
-      <div class="container">
-        <h2>Jane Doe</h2>
-        <p class="title">CEO & Founder</p>
-        <p>Some text that describes me lorem ipsum ipsum lorem.</p>
-        <p>jane@example.com</p>
-        <p><button class="button">Contact</button></p>
-      </div>
+              <div class="col-sm-6">
+                <div class="card">
+                  <img class="card-img-top" src="{% static 'main/images/aviad_image.png' %}" alt="Card image cap">
+                  <div class="card-body">
+                    <h5 class="card-title">הוגה הרעיון</h5>
+                    <p class="card-text">מטרתי היא לעזור ללימוד וחקירה תורנית</p>
+                    <a href="/contact" class="btn btn-primary">צור קשר</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+<!--                <div class="card">-->
+<!--                  <div class="card-body">-->
+<!--                    <h5 class="card-title">Special title treatment</h5>-->
+<!--                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>-->
+<!--                    <a href="#" class="btn btn-primary">Go somewhere</a>-->
+<!--                  </div>-->
+<!--                </div>-->
+              </div>
+          </div>
     </div>
-  </div>
-
-  <div class="column">
-    <div class="card">
-      <img src="/w3images/team2.jpg" alt="Mike" style="width:100%">
-      <div class="container">
-        <h2>Mike Ross</h2>
-        <p class="title">Art Director</p>
-        <p>Some text that describes me lorem ipsum ipsum lorem.</p>
-        <p>mike@example.com</p>
-        <p><button class="button">Contact</button></p>
-      </div>
-    </div>
-  </div>
-
-
- </div>
-      </div>
-    </section>
+</section>
 {% endblock %}
