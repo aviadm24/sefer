@@ -17,7 +17,7 @@
     <!-- Page Content -->
     <div id="page-content-wrapper">
 
-        <button class="btn btn-primary" id="menu-toggle">Toggle Menu</button>
+        <button class="btn btn-primary" id="menu-toggle">מפרשים</button>
         {% include "ycomment.html" %}
         {% include "add_comment_button.html" %}
 
@@ -26,10 +26,10 @@
             <h2>{{error}}</h2>
         {%else%}
             <h2>book: {{book}}</h2>
-            <p>next: <a href="/api/texts/{{next}}?pad=0">{{next}}</a></p><p>prev: <a href="/api/texts/{{prev}}?pad=0">{{prev}}</a></p>
-            <p>chapter number: {{length}}</p>
-            {% for num in range %}
-            <a href="/api/texts/{{book}}.{{num}}">{{num}}</a>
+            <p>הבא: <a href="/api/texts/{{next}}?pad=0">{{next}}</a></p><p>הקודם: <a href="/api/texts/{{prev}}?pad=0">{{prev}}</a></p>
+            <p>מספר עמודים: {{length}}</p>
+            {% for num, heLetter in hebrewLetterList %}
+            <a href="/api/texts/{{book}}.{{num}}"> {{heLetter}}  </a>
             {%endfor%}
 
             <div id="text" dir="rtl">

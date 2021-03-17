@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from .gematria import int_to_gematria
 
 
 class YcommentListView(ListView):
@@ -132,18 +133,22 @@ def get_index_names(model=None):
 
 def get_correct_page_range(primary_category, length):
     page_list = []
+    hebrewLetterList = []
     if primary_category == "Talmud":
         last = 0
         for num in range(2, int(length+2)//2+1):
             page_list.append(str(num)+'a')
             page_list.append(str(num)+'b')
+            hebrewLetterList.append((str(num)+'a', int_to_gematria(str(num))+'.'))
+            hebrewLetterList.append((str(num)+'b', int_to_gematria(str(num)) + ':'))
             last = num
         if length % 2 != 0:
             page_list.append(str(last+1) + 'a')
+            hebrewLetterList.append((str(num)+'a', int_to_gematria(str(last+1)) + '.'))
 
-        return page_list
+        return page_list, hebrewLetterList
     else:
-        return range(1, length + 1)
+        return range(1, length + 1), hebrewLetterList
 
 
 def get_next_prev(jsonResponse):
@@ -244,11 +249,11 @@ def texts(request, slug=None):
         try:
             next, prev = get_next_prev(jsonResponse)
             length = jsonResponse['length']
-            page_range = get_correct_page_range(jsonResponse['primary_category'], length)
+            page_range, hebrewLetterList = get_correct_page_range(jsonResponse['primary_category'], length)
             indexNames = get_index_names()
             return render(request, "texts.html",
                           {"jsonResponse": jsonResponse["he"], "next": next, 'prev': prev, "length": length,
-                           "range": page_range, 'book': book, 'links': linksToPass, "form": form,
+                           "range": page_range, "hebrewLetterList": hebrewLetterList, 'book': book, 'links': linksToPass, "form": form,
                            "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
         except KeyError:
             next, prev = get_next_prev(jsonResponse)
