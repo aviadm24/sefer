@@ -19,7 +19,9 @@
 
         <button class="btn btn-primary" id="menu-toggle">מפרשים</button>
         {% include "ycomment.html" %}
-        {% include "add_comment_button.html" %}
+        <div>
+            <button class="btn btn-success" onclick="add_comment()">add comment</button>
+        </div>
 
       <div class="container-fluid resizable">
         {%if error%}

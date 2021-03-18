@@ -97,8 +97,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'sefaria_django.urls'
-for file in os.listdir(os.path.join(BASE_DIR, 'main', 'templates', 'account')):
-    print(file)
+# for file in os.listdir(os.path.join(BASE_DIR, 'main', 'templates', 'account')):
+#     print(file)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
