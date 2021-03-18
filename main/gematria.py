@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# https://github.com/diaphon/gematria
+# https://github.com/OriHoch/python-hebrew-numbers
 from os import path
 import io
 import yaml

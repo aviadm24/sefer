@@ -64,14 +64,23 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', '')
+EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '')
+EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', '')
+EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
+
+# for testing
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
 
 LOGIN_REDIRECT_URL = "/"
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# for testing
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
 # ACCOUNT_USERNAME_REQUIRED = False
