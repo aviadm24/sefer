@@ -44,6 +44,15 @@ myobj = json.dumps({
   "type": "text"
 })
 
-x = requests.post(url, data=myobj)
+# x = requests.post(url, data=myobj)
 
-print(x.text)
+# print(x.text)
+import sendgrid
+import os
+from sendgrid.helpers.mail import Mail
+
+# sg = sendgrid.SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+sg = sendgrid.SendGridAPIClient("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")
+message = Mail(from_email='aviadm24@gmail.com', to_emails='aviadm32@gmail.com',
+                           subject='Example Subject ', html_content='<strong>and easy to do anywhere, even with Python</strong>')
+response = sg.send(message)
