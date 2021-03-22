@@ -64,13 +64,13 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+#
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
+# EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
 
 # EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
 # EMAIL_HOST = 'smtp.sendgrid.net'
@@ -78,10 +78,12 @@ EMAIL_USE_TLS = True
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
 
-# EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', '')
-# EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '')
-# EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', '')
-# EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
+
+EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', '')
+EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '')
+EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', '')
+EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
+
 
 # for testing
 # EMAIL_HOST = 'smtp.gmail.com'
