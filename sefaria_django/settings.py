@@ -23,9 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'fsqdu1o)=zae74juo8q=!m8l_^ounlo^ignoblegd!($7pq9y!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+
+# ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["http://www.toracomments.com/", "http://127.0.0.1:800/"]
 
 
 # Application definition
@@ -64,34 +67,20 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-#
-# EMAIL_HOST = 'smtp.sendgrid.net'
-# EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
-# EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-
-# EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
-# EMAIL_HOST = 'smtp.sendgrid.net'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
-
-
 EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', '')
 EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '')
 EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', '')
 EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
-
-
-# for testing
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = ''
-# EMAIL_HOST_PASSWORD = ''
-
+if EMAIL_HOST == '':
+    creds = []
+    with open("mailgun.txt", "r") as f:
+        for line in f.readlines():
+            creds.append(line)
+    EMAIL_HOST = creds[0]
+    EMAIL_PORT = creds[1]
+    EMAIL_HOST_USER = creds[2]
+    EMAIL_HOST_PASSWORD = creds[3]
+print("EMAIL_HOST: ", EMAIL_HOST)
 LOGIN_REDIRECT_URL = "/"
 
 # for testing
@@ -193,6 +182,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Activate Django-Heroku.
 django_heroku.settings(locals())

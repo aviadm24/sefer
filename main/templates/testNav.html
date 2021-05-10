@@ -26,6 +26,9 @@
       <li class="nav-item">
         <a class="nav-link disabled" href="#">ניהול</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/mechkar/">ניהול מחקר (מכון פוע"ה)</a>
+      </li>
       {% if user.is_authenticated %}
     <li class="nav-item">
         <a class="nav-link">שלום: {{request.user}}</a>
@@ -44,9 +47,9 @@
 
 
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-success my-2 my-sm-0" type="submit">חפש</button>
+    <form class="form-inline my-2 my-lg-0" action="/search/">
+      <input class="form-control mr-sm-2" id="search_word" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-success my-2 my-sm-0" id="search_form" type="submit">חפש</button>
     </form>
   </div>
 </nav>

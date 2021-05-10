@@ -9,7 +9,8 @@ from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from .gematria import int_to_gematria
-
+import openpyxl
+import pandas as pd
 
 class YcommentListView(ListView):
 
@@ -270,3 +271,49 @@ def contact(request):
 
 def about(request):
     return render(request, "main/about.html", {})
+
+
+def dashboard(request):
+    return render(request, "main/dashboard.html", {})
+
+
+def search_results(request):
+    return render(request, "main/search_results.html", {})
+
+
+def excel_parsing(request):  # based on - https://github.com/anuragrana/excel-file-upload-django
+    if request.method == "GET":
+        return render(request, 'main/excel_parsing.html', {})
+    else:
+        print(request.POST)
+        search_word = request.POST.get('search_word')
+        print(request.FILES)
+        excel_file = request.FILES.get("excel_file")
+        df = pd.read_excel(excel_file, engine='openpyxl')
+        # wb = openpyxl.load_workbook(excel_file)
+        # sheets = wb.sheetnames
+        # worksheet = wb[sheets[0]]
+        # active_sheet = wb.active
+        # excel_data = list()
+        # for row_num, row in enumerate(worksheet.iter_rows()):
+        #     if row_num > 50000:
+        #         row_data = list()
+        #         hasTheWord = False
+        #         for cell in row:
+        #             cell_data = str(cell.value)
+        #
+        #             if search_word in cell_data:
+        #                 hasTheWord = True
+        #                 cell_data = "<mark>"+cell_data+"</mark>"
+        #                 print(cell_data)
+        #             row_data.append(cell_data)
+        #         if hasTheWord:
+        #             excel_data.append(row_data)
+        #     elif row_num <= 1:
+        #         row_data = list()
+        #         for cell in row:
+        #             cell_data = str(cell.value)
+        #             row_data.append(cell_data)
+        #         excel_data.append(row_data)
+
+        return render(request, 'main/excel_parsing.html', {"excel_data": df.head()})
