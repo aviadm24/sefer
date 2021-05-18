@@ -6,3 +6,4 @@ migrations/
 env/
 sendgrid.env
 mailgun.txt
+secret_key.txt
