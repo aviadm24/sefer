@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import django_heroku
 import os
+import socket
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,17 +24,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if os.path.exists('secret_key.txt'):
     with open("secret_key.txt", "r") as f:
         SECRET_KEY = f.readline()
-        print("SECRET KEY: ", SECRET_KEY)
 else:
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
-DEBUG = True
-
+ipaddress = socket.gethostbyname(socket.gethostname())
+print('ip_address:', ipaddress)
+if ipaddress.startswith('172'):
+    DEBUG = False
+else:
+    DEBUG = True
 
 # ALLOWED_HOSTS = ["*"]
-ALLOWED_HOSTS = ["http://www.toracomments.com/", "http://127.0.0.1:800/"]
+ALLOWED_HOSTS = ["http://www.toracomments.com/", "http://127.0.0.1:8000/"]
 
 
 # Application definition
@@ -55,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
 
 SITE_ID = 1
 
@@ -85,7 +89,7 @@ if EMAIL_HOST == '':
     EMAIL_PORT = creds[1]
     EMAIL_HOST_USER = creds[2]
     EMAIL_HOST_PASSWORD = creds[3]
-print("EMAIL_HOST: ", EMAIL_HOST)
+# print("EMAIL_HOST: ", EMAIL_HOST)
 LOGIN_REDIRECT_URL = "/"
 
 # for testing
@@ -185,12 +189,57 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, 'static'),
-# )
-#
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
+
+# https://stackoverflow.com/questions/51466192/server-error-500-django-deployment-on-heroku
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': ('%(asctime)s [%(process)d] [%(levelname)s] '
+                       'pathname=%(pathname)s lineno=%(lineno)s '
+                       'funcname=%(funcName)s %(message)s'),
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        }
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    }
+}
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
