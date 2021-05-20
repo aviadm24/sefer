@@ -12,8 +12,8 @@ from .gematria import int_to_gematria
 import openpyxl
 import pandas as pd
 
-class YcommentListView(ListView):
 
+class YcommentListView(ListView):
     model = Ycomment
     paginate_by = 100  # if pagination is desired
 
@@ -40,10 +40,10 @@ def add_file(request):
 def add_comment(request):
     form = YcommentForm()
     if request.method == "POST":
-        print("post: ", request.POST)
+        # print("post: ", request.POST)
         form = YcommentForm(request.POST)  # if no files
         if form.is_valid():
-            print("form: ", form.cleaned_data)
+            # print("form: ", form.cleaned_data)
             obj = form.save(commit=False)
             obj.user = request.user
             obj.save()
@@ -98,7 +98,7 @@ def json_extract(obj, key):
 
 def get_model(Model, url):
     if not Model.objects.filter(url=url).exists():
-        print("index response not saved in db")
+        # print("index response not saved in db")
         response = requests.get(url)
         response.raise_for_status()
         model = Model()
@@ -155,9 +155,9 @@ def get_correct_page_range(primary_category, length):
 def get_next_prev(jsonResponse):
     try:
         next = jsonResponse['next']
-        print("next: ", next)
+        # print("next: ", next)
         prev = jsonResponse['prev']
-        print("prev: ", prev)
+        # print("prev: ", prev)
     except (KeyError, AttributeError):
         next = 'no next page'
         prev = 'no prev page'
@@ -207,8 +207,8 @@ def titles(request):
     url = "http://www.sefaria.org/api/index/titles"
     model = get_model(Index, url)
     jsonResponse = dict(model.json)
-    print("Entire JSON response")
-    print(jsonResponse.keys())
+    # print("Entire JSON response")
+    # print(jsonResponse.keys())
     return render(request, "titles.html", {"jsonResponse": jsonResponse["books"]})
 
 
@@ -229,9 +229,9 @@ def texts(request, slug=None):
         print(url)
         model = get_model(Texts, url)
         jsonResponse = dict(model.json)
-        print("res: ", jsonResponse.keys())
-        for s in ['ref', 'heRef', 'order', 'sections', 'heSectionRef', 'sectionRef']:
-            print(s, " - ", jsonResponse[s])
+        # print("res: ", jsonResponse.keys())
+        # for s in ['ref', 'heRef', 'order', 'sections', 'heSectionRef', 'sectionRef']:
+        #     print(s, " - ", jsonResponse[s])
         link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
         link_model = get_model(Links, link_url)
         links_list = link_model.json
@@ -242,7 +242,7 @@ def texts(request, slug=None):
             linkdDictToPass['sourceRef'] = linkDict['sourceRef']
             linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
             linksToPass.append((linkdDictToPass))
-        print("linkes: ", len(links_list))
+        # print("linkes: ", len(links_list))
         try:
             book = jsonResponse['book'].replace(' ', '_')
         except KeyError:
@@ -258,7 +258,7 @@ def texts(request, slug=None):
                            "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
         except KeyError:
             next, prev = get_next_prev(jsonResponse)
-            print(jsonResponse.keys())
+            # print(jsonResponse.keys())
             indexNames = get_index_names()
             return render(request, "texts.html",
                           {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
