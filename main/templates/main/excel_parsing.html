@@ -32,13 +32,19 @@
                         <input class="form-control" id="search_word" type="text" name="search_word" required data-error="Please enter your search word">
                         <div class="help-block with-errors"></div>
                       </div>
-                      <!-- Message -->
-<!--                      <div class="form-group label-floating">-->
-<!--                          <label for="message" class="control-label">הודעה</label>-->
-<!--                          <textarea class="form-control" rows="3" id="message" name="message" required data-error="Write your message"></textarea>-->
-<!--                          <div class="help-block with-errors"></div>-->
-<!--                      </div>-->
-                      <!-- Form Submit -->
+                      <div class="form-group label-floating">
+                        <input class="form-control" type="hidden" id="hidden_input" type="text" name="hidden_input" required data-error="Please enter your search word">
+                      </div>
+                       <div class="form-group">
+                        <label >Example multiple select</label>
+                        <select multiple class="form-control" id="by_row">
+                            {% for key, value in select_elements.items %}
+                               <option value="{{value}}">
+                                   {{value}}
+                               </option>
+                            {% endfor %}
+                        </select>
+                      </div>
                       <div class="form-submit mt-5">
                           <button class="btn btn-primary" type="submit" id="form-submit"><i class="material-icons mdi mdi-message-outline"></i>חפש</button>
                           <div id="msgSubmit" class="h3 text-center hidden"></div>
@@ -50,14 +56,19 @@
       </div>
     </section>
 
-        {% autoescape off %}
-        {% for row in excel_data %}
-            {% for cell in row %}
+<div class="overflow-scroll">
+    {% for table in tables %}
+            {{ table|safe }}
+    {% endfor %}
+</div>
+<!--        {% autoescape off %}-->
+<!--        {% for row in excel_data %}-->
+<!--            {% for cell in row %}-->
 
-                {{ cell }}
+<!--                {{ cell }}-->
 
-            {% endfor %}
-            <br>
-        {% endfor %}
-        {% endautoescape %}&nbsp;&nbsp;
+<!--            {% endfor %}-->
+<!--            <br>-->
+<!--        {% endfor %}-->
+<!--        {% endautoescape %}&nbsp;&nbsp;-->
 {% endblock %}

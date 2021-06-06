@@ -3,7 +3,9 @@
 {% block content %}
     <div class="container resizable">
     <p dir="rtl">מה אתה לומד עכשיו?</p>
-     {% with dict=jsonResponse template="treeTest.html" %}
+        <a>ללוח לימוד יומי לחץ </a> <button id="getCalendar">כאן</button>
+        <div id="results_tab"></div>
+    {% with dict=jsonResponse template="treeTest.html" %}
      {% include template %}
     {% endwith %}
 

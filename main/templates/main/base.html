@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
     <link rel='stylesheet' href='https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css'>
-
+    <link rel='stylesheet' href='https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css'>
+    <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css"/>
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'ocr/css/editor.css' %}">
     <link rel="stylesheet" href="{% static 'main/css/side_bar.css' %}">
@@ -15,7 +16,7 @@
     <link rel="stylesheet" href="{% static 'main/css/dashboard.css' %}">
     <title>Ycomments</title>
 </head>
-<body>
+<body class="overflow-scroll">
 {% include 'testNav.html' %}
 <div class="flex-fill">
     {% block content %}{% endblock %}
@@ -31,18 +32,76 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.0/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
 <script src="{% static 'main/js/bootConfirm.js' %}"></script>
 <script src="{% static 'main/js/add_comment.js' %}"></script>
 <script src="{% static 'main/js/search.js' %}"></script>
 <script src="{% static 'ocr/js/editor.js' %}"></script>
 <script src="{% static 'main/js/getSelectionText.js' %}"></script>
+<script src="{% static 'main/js/getCalendar.js' %}"></script>
   <!-- Menu Toggle Script -->
-  <script>
-    $("#menu-toggle").click(function(e) {
-      e.preventDefault();
-      $("#wrapper").toggleClass("toggled");
-    });
-  </script>
+    <script>
+        $("#menu-toggle").click(function(e) {
+          e.preventDefault();
+          $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+        var table = $('.dataframe').DataTable({
+            "scrollX": true,
+            "columnDefs": [
+                { "searchable": false, "targets": 0 }
+              ]
+            });
+            table.columns( '.select-filter' ).every( function () {
+            var that = this;
 
+            // Create the select list and search operation
+            var select = $('<select />')
+                .appendTo(
+                    this.footer()
+                )
+                .on( 'change', function () {
+                    that
+                        .search( $(this).val() )
+                        .draw();
+                } );
+
+            // Get the search data for the first column and add to the select list
+            this
+                .cache( 'search' )
+                .sort()
+                .unique()
+                .each( function ( d ) {
+                    select.append( $('<option value="'+d+'">'+d+'</option>') );
+                } );
+            } );
+        } );
+
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#by_row').multiselect({
+                selectAllValue: 'multiselect-all',
+                enableCaseInsensitiveFiltering: true,
+                enableFiltering: true,
+                maxHeight: '300',
+                buttonWidth: '235',
+                onChange: function(element, checked) {
+                    var brands = $('#by_row option:selected');
+                    var selected = [];
+                    $(brands).each(function(index, brand){
+                        selected.push($(this).val());
+                        document.getElementById("hidden_input").value = JSON.stringify(selected);
+                    });
+
+                    console.log(selected);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
