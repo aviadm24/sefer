@@ -26,7 +26,7 @@ $('#search_form').on('click', function (e) {
 //                this.alert("Hello "+firstname);
                 this.console.log(oldWinDAta)
                 var search_results_tab = this.document.getElementById("search_results");
-                search_results_tab.append("test")
+                //search_results_tab.append("test")
                 //$('#search_results').empty();
                 $.each(oldWinDAta.hits.hits, function() {
                     var text = this.highlight.exact;

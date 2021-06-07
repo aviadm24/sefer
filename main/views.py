@@ -11,6 +11,7 @@ from django.views.generic.list import ListView
 from .gematria import int_to_gematria
 import openpyxl
 import pandas as pd
+import numpy as np
 
 
 class YcommentListView(ListView):
@@ -293,7 +294,11 @@ def excel_parsing(request):  # based on - https://github.com/anuragrana/excel-fi
         print(type(search_json))
         print(search_json)
         df = pd.read_excel(excel_file, engine='openpyxl')
-        df = df.dropna(axis=1, how='all')
+        df.dropna(axis=1, how='all', inplace=True)
+        try:
+            df = df.replace(np.nan, '', regex=True)
+        except AttributeError:
+            pass
         df_head = list(df)
         indexes = list(range(1, len(df_head)+1))
         select_elements = dict(zip(indexes, df_head))
