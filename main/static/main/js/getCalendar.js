@@ -11,7 +11,9 @@ $('#getCalendar').on('click', function (e) {
                     var title = this.title.en;
                     var heTitle = this.title.he;
                     var clean_link = this.url.replace(".", " ");
+                    var ref = this.ref;
                     var link = '/api/texts/'+clean_link;
+                    var link = '/api/texts/'+ref;
                     var output='<li>'+title+'</li><a href="'+link+'">('+heTitle+')</a>';
                     results_tab.insertAdjacentHTML('beforeend', output);
                 });

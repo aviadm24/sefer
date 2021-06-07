@@ -19,7 +19,7 @@ urlpatterns = [
     path('', views.home, name="home"),
     path('index/<int:number>/', views.index, name="index"),
     path('titles/', views.titles, name="titles"),
-    re_path(r"^api/texts/(?P<slug>[a-zA-Z0-9,'_:. +]*)/$", views.texts),
+    re_path(r"^api/texts/(?P<slug>[a-zA-Z0-9,'_:. +-]*)/$", views.texts),
     path('profile/', views.YcommentListView.as_view(), name='ycomment-list'),
     path('add_comment/', views.add_comment, name="add_comment"),
     path('remove_comment/<int:id>/', views.remove_comment, name="remove_comment"),
