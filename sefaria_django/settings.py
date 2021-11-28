@@ -82,13 +82,16 @@ EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', '')
 EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
 if EMAIL_HOST == '':
     creds = []
-    with open("mailgun.txt", "r") as f:
-        for line in f.readlines():
-            creds.append(line)
-    EMAIL_HOST = creds[0]
-    EMAIL_PORT = creds[1]
-    EMAIL_HOST_USER = creds[2]
-    EMAIL_HOST_PASSWORD = creds[3]
+    try:
+        with open("mailgun.txt", "r") as f:
+            for line in f.readlines():
+                creds.append(line)
+        EMAIL_HOST = creds[0]
+        EMAIL_PORT = creds[1]
+        EMAIL_HOST_USER = creds[2]
+        EMAIL_HOST_PASSWORD = creds[3]
+    except FileNotFoundError:
+        print("no mailgun.txt file found!")
 # print("EMAIL_HOST: ", EMAIL_HOST)
 LOGIN_REDIRECT_URL = "/"
 
