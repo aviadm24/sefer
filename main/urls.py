@@ -29,5 +29,6 @@ urlpatterns = [
     path('about/', views.about),
     path('dashboard/', views.dashboard),
     path('search_results/', views.search_results),
+    path('search_titles/', views.search_titles),
     path('mechkar/', views.excel_parsing, name='excel_parsing'),
 ]
