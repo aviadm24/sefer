@@ -9,6 +9,9 @@
     <link rel='stylesheet' href='https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css'>
     <link rel='stylesheet' href='https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css'>
     <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css"/>
+<!--    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"/>-->
+    <link rel="stylesheet" href="{% static 'main/EasyAutocomplete-1.3.5/easy-autocomplete.min.css' %}">
+
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'ocr/css/editor.css' %}">
     <link rel="stylesheet" href="{% static 'main/css/side_bar.css' %}">
@@ -34,7 +37,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-<script src = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>-->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>-->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>-->
+<script src="{% static 'main/EasyAutocomplete-1.3.5/jquery.easy-autocomplete.min.js' %}"></script>
 <script src="{% static 'main/js/bootConfirm.js' %}"></script>
 <script src="{% static 'main/js/add_comment.js' %}"></script>
 <script src="{% static 'main/js/search.js' %}"></script>
@@ -102,6 +108,21 @@
                 }
             });
         });
+    </script>
+    <script>
+        var options = {
+	data: [{% for book in books %}
+                "{{book}}",
+            {% endfor %}],
+            list: {
+		maxNumberOfElements: 10,
+		match: {
+			enabled: true
+		}
+		}
+};
+
+$("#search_title").easyAutocomplete(options);
     </script>
 </body>
 </html>

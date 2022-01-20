@@ -169,12 +169,22 @@ def home(request):
     url = "http://www.sefaria.org/api/index"
     model = get_model(Index, url)
     indexNames = get_index_names(model=model)
+    bookNameList = []
+    for number in range(len(indexNames)):
+        jsonResponse = dict(model.json[number])
+        for c in jsonResponse["contents"]:
+            titles = json_extract(c, "title")
+            heTitles = json_extract(c, "heTitle")
+            subDict = dict(zip(heTitles, titles))
+            for heTitle in heTitles:
+                bookNameList.append(heTitle)
+    print(bookNameList[:10])
     if not MainCategories.objects.filter(url=url).exists():
         mainCategories = MainCategories()
         mainCategories.url = url
         mainCategories.catJson = json.dumps(indexNames)
         mainCategories.save()
-    return render(request, "home.html", {"indexNames": indexNames})
+    return render(request, "home.html", {"indexNames": indexNames, "books": bookNameList})
 
 
 def index(request, number=0):
@@ -214,35 +224,42 @@ def titles(request):
 
 
 def search_titles(request):
+    # https://www.geeksforgeeks.org/implement-search-autocomplete-for-input-fields-in-django/
     url = "http://www.sefaria.org/api/index"
     model = get_model(Index, url)
     indexNames = get_index_names(model=model)
     listOfCatdict = []
+    mainDict = {}
+    if request.POST:
+        data = request.POST.dict()
+        title = data.get('search_title')
+        print('title: ', title)
     for number in range(len(indexNames)):
         jsonResponse = dict(model.json[number])
-        mainDict = {}
         # index = 0
         # mainDict = tree_parse(jsonDict=jsonResponse, index=index, returnDict=mainDict)
         for c in jsonResponse["contents"]:
             titles = json_extract(c, "title")
             heTitles = json_extract(c, "heTitle")
-            subDict = dict(zip(heTitles, titles))
-            # print(subDict)
-            try:
-                mainDict[c["heCategory"]] = subDict
-            except KeyError:
-                mainDict[c["heTitle"]] = subDict
+            if title in titles or title in heTitles:
+                print("found: ", titles)
+                subDict = dict(zip(heTitles, titles))
+                print(subDict[title])
+                try:
+                    mainDict[c["heCategory"]] = subDict
+                    print("cat: ", c["heCategory"])
+                except KeyError:
+                    mainDict[c["heTitle"]] = subDict
+                    print("title: ", c["heTitle"])
+            print("main dict: ", mainDict)
         listOfCatdict.append(mainDict)
-    if request.POST:
-        data = request.POST.dict()
-        title = data.get('search_title')
-        print('title: ', title)
     bookNameList = []
     for catDict in listOfCatdict:
-        print(catDict.values())
+        # print(catDict.values())
         bookNameList.append(catDict.values())
-    return render(request, "titles.html", {"bookNameList": bookNameList})
-
+    # return render(request, "titles.html", {"bookNameList": bookNameList})
+    print(mainDict)
+    return render(request, "searchTitles.html", {"jsonResponse": mainDict})
 
 
 def texts(request, slug=None):

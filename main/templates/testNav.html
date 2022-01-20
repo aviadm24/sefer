@@ -52,9 +52,9 @@
       <button class="btn btn-success my-2 my-sm-0" id="search_form" type="submit">חפש</button>
     </form>
 
-    <form class="form-inline my-2 my-lg-0" action="/search_titles/">
-      <input class="form-control mr-sm-2" id="search_title" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-success my-2 my-sm-0" id="search_title_form" type="submit">חפש ספר</button>
+    <form method="POST" class="form-inline my-2 my-lg-0" action="/search_titles/">{% csrf_token %}
+      <input class="form-control mr-sm-2" id="search_title" name="search_title" type="search" placeholder="Search" aria-label="Search">
+      <input class="btn btn-success my-2 my-sm-0" id="search_title_form" type="submit" value="חפש ספר">
     </form>
-    </div>
+  </div>
 </nav>
