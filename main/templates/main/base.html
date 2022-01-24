@@ -110,16 +110,17 @@
         });
     </script>
     <script>
-        var options = {
+var options = {
 	data: [{% for book in books %}
                 "{{book}}",
             {% endfor %}],
-            list: {
-		maxNumberOfElements: 10,
-		match: {
-			enabled: true
-		}
-		}
+    list: {
+        maxNumberOfElements: 10,
+        match: {
+            enabled: true
+            }
+        },
+    adjustWidth: false
 };
 
 $("#search_title").easyAutocomplete(options);

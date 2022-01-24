@@ -282,20 +282,23 @@ def texts(request, slug=None):
         # print("res: ", jsonResponse.keys())
         # for s in ['ref', 'heRef', 'order', 'sections', 'heSectionRef', 'sectionRef']:
         #     print(s, " - ", jsonResponse[s])
-        link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
-        link_model = get_model(Links, link_url)
-        links_list = link_model.json
+        print("jsonResponse.keys(): ", jsonResponse.keys())
+        if 'ref' in jsonResponse.keys():
+            link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
+            link_model = get_model(Links, link_url)
+            links_list = link_model.json
 
-        for link in links_list:
-            linkdDictToPass = {}
-            linkDict = dict(link)
-            linkdDictToPass['sourceRef'] = linkDict['sourceRef']
-            linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
-            linksToPass.append((linkdDictToPass))
-        # print("linkes: ", len(links_list))
+            for link in links_list:
+                linkdDictToPass = {}
+                linkDict = dict(link)
+                linkdDictToPass['sourceRef'] = linkDict['sourceRef']
+                linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
+                linksToPass.append((linkdDictToPass))
+            # print("linkes: ", len(links_list))
         try:
             book = jsonResponse['book'].replace(' ', '_')
         except KeyError:
+            book = ""
             print("no book key in json response")
         try:
             next, prev = get_next_prev(jsonResponse)
@@ -308,13 +311,18 @@ def texts(request, slug=None):
                            "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
         except KeyError:
             next, prev = get_next_prev(jsonResponse)
-            # print(jsonResponse.keys())
+            print("jsonResponse.keys(): ", jsonResponse.keys())
             indexNames = get_index_names()
-            return render(request, "texts.html",
-                          {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
-                           "form": form, "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
-
-
+            if "he" in jsonResponse.keys():
+                return render(request, "texts.html",
+                              {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
+                               "form": form, "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
+            else:
+                return render(request, "texts.html",
+                              {"jsonResponse": jsonResponse, 'book': book, 'next': next, 'prev': prev,
+                               'links': linksToPass,
+                               "form": form, "indexNames": indexNames, "user_comments": user_comments,
+                               "all_comments": all_comments})
 def contact(request):
     return render(request, "main/contact.html", {})
 
