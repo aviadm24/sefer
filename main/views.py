@@ -1,8 +1,10 @@
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 import requests
-from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment
+from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment, Commentators
 from .forms import YcommentForm, FileUploadForm
 import json
+import re
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.utils import timezone
@@ -12,6 +14,8 @@ from .gematria import int_to_gematria
 import openpyxl
 import pandas as pd
 import numpy as np
+logging.basicConfig(filename='views.log', filemode='w', encoding='utf-8', level=logging.DEBUG)
+logging.debug("test")
 
 
 class YcommentListView(ListView):
@@ -97,7 +101,7 @@ def json_extract(obj, key):
     return values
 
 
-def get_model(Model, url):
+def get_model(Model, url, **kwargs):
     if not Model.objects.filter(url=url).exists():
         # print("index response not saved in db")
         response = requests.get(url)
@@ -105,10 +109,15 @@ def get_model(Model, url):
         model = Model()
         model.url = url
         model.json = response.json()
+        for k, v in kwargs.items():
+            # field = getattr(Commentators, k)
+            # field = v
+            if k == "main_text_url":
+                model.main_text_url = v
         model.save()
     else:
         print("index response all ready saved in db")
-        model = Model.objects.get(url=url)
+    model = Model.objects.get(url=url)
     return model
 
 
@@ -230,6 +239,7 @@ def search_titles(request):
     indexNames = get_index_names(model=model)
     listOfCatdict = []
     mainDict = {}
+    title = ''
     if request.POST:
         data = request.POST.dict()
         title = data.get('search_title')
@@ -241,15 +251,19 @@ def search_titles(request):
         for c in jsonResponse["contents"]:
             titles = json_extract(c, "title")
             heTitles = json_extract(c, "heTitle")
-            if title in titles or title in heTitles:
-                print("found: ", titles)
+            # if title in titles or title in heTitles:
+            if title in heTitles:
                 subDict = dict(zip(heTitles, titles))
-                print(subDict[title])
+                print(subDict)
+                oneBookDict = {title: subDict[title]}
+                print(oneBookDict)
                 try:
-                    mainDict[c["heCategory"]] = subDict
+                    # mainDict[c["heCategory"]] = subDict
+                    mainDict[c["heCategory"]] = oneBookDict
                     print("cat: ", c["heCategory"])
                 except KeyError:
-                    mainDict[c["heTitle"]] = subDict
+                    # mainDict[c["heTitle"]] = subDict
+                    mainDict[c["heTitle"]] = oneBookDict
                     print("title: ", c["heTitle"])
             print("main dict: ", mainDict)
         listOfCatdict.append(mainDict)
@@ -279,21 +293,115 @@ def texts(request, slug=None):
         print(url)
         model = get_model(Texts, url)
         jsonResponse = dict(model.json)
-        # print("res: ", jsonResponse.keys())
-        # for s in ['ref', 'heRef', 'order', 'sections', 'heSectionRef', 'sectionRef']:
-        #     print(s, " - ", jsonResponse[s])
-        print("jsonResponse.keys(): ", jsonResponse.keys())
         if 'ref' in jsonResponse.keys():
             link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
             link_model = get_model(Links, link_url)
             links_list = link_model.json
-
             for link in links_list:
                 linkdDictToPass = {}
                 linkDict = dict(link)
                 linkdDictToPass['sourceRef'] = linkDict['sourceRef']
                 linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
                 linksToPass.append((linkdDictToPass))
+        try:
+            book = jsonResponse['book'].replace(' ', '_')
+        except KeyError:
+            book = ""
+            print("no book key in json response")
+        try:
+            next, prev = get_next_prev(jsonResponse)
+            length = jsonResponse['length']
+            page_range, hebrewLetterList = get_correct_page_range(jsonResponse['primary_category'], length)
+            indexNames = get_index_names()
+            return render(request, "texts.html",
+                          {"jsonResponse": jsonResponse["he"], "ref": str(jsonResponse["ref"]), "next": next, 'prev': prev, "length": length,
+                           "range": page_range, "hebrewLetterList": hebrewLetterList, 'book': book, 'links': linksToPass, "form": form,
+                           "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
+        except KeyError:
+            next, prev = get_next_prev(jsonResponse)
+            print("jsonResponse.keys(): ", jsonResponse.keys())
+            indexNames = get_index_names()
+            if "he" in jsonResponse.keys():
+                return render(request, "texts.html",
+                              {"jsonResponse": jsonResponse["he"], 'book': book, "ref": str(jsonResponse["ref"]), 'next': next, 'prev': prev, 'links': linksToPass,
+                               "form": form, "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
+            else:
+                return render(request, "texts.html",
+                              {"jsonResponse": jsonResponse, 'book': book, "ref": str(jsonResponse["ref"]), 'next': next, 'prev': prev,
+                               'links': linksToPass,
+                               "form": form, "indexNames": indexNames, "user_comments": user_comments,
+                               "all_comments": all_comments})
+
+
+def get_comment(request):
+    """Check username availability"""
+    url = request.GET.get('url', None)
+    main_text_url = request.GET.get('main_text_url', None)
+    url = f"https://www.sefaria.org"+str(url)
+    main_text_url = f"https://www.sefaria.org" + str(main_text_url)
+    print(url)
+    logging.info("main_text_url: ", main_text_url)
+    text_instance = get_model(Texts, main_text_url)
+    model = get_model(Commentators, url, main_text_url=text_instance)
+    logging.info("model: ", model)
+    jsonResponse = dict(model.json)
+    print("jsonResponse: ", jsonResponse)
+    logging.info("jsonResponse: ", jsonResponse)
+    # content = requests.get(url)
+    if 'error' in jsonResponse.keys():
+        response = {
+            'error': 'true'
+        }
+    else:
+        # print(jsonResponse.json().keys())
+        he = jsonResponse['he']
+        print(he)
+        commentary = jsonResponse['commentary']
+        filter_string = "Rashi"
+        commentary_list = [comm for comm in commentary if filter_string in comm["ref"]]
+        response = {
+            'commentary': commentary_list
+        }
+    return JsonResponse(response)
+
+
+def texts_with_commentators(request, slug=None):
+    logging.info("slug: " + slug)
+    form = YcommentForm()
+    linksToPass = []
+    user_comments = []
+    all_comments = []
+    if slug:
+        if request.user.is_authenticated:
+            user_comments = Ycomment.objects.filter(user=request.user).filter(url=request.build_absolute_uri())
+        else:
+            all_comments = Ycomment.objects.all()
+        url = "http://www.sefaria.org/api/texts/{}".format(slug)
+        model = get_model(Texts, url)
+        jsonResponse = dict(model.json)
+        # if len(jsonResponse['sectionNames']) > len(jsonResponse['sections']):
+        #     next_step_url = url+":1"
+        #     logging.info("new: ", next_step_url)
+        #     model = get_model(Texts, next_step_url)
+        #     jsonResponse = dict(model.json)
+        if 'ref' in jsonResponse.keys():
+            link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
+            link_model = get_model(Links, link_url)
+            links_list = link_model.json
+            for link in links_list:
+                linkdDictToPass = {}
+                linkDict = dict(link)
+                linkdDictToPass['sourceRef'] = linkDict['sourceRef']
+                linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
+                linkdDictToPass['he'] = linkDict['he']
+                if linkDict['index_title'].startswith('Rashi'):
+                    dibur_hamatchil = linkDict['he'].split('-')[0].strip()
+                    line_index = [index for index, x in enumerate(jsonResponse['he']) if re.search(dibur_hamatchil, x)][0]
+                    linkdDictToPass['lineIndex'] = line_index
+                else:
+                    linkdDictToPass['lineIndex'] = 0
+                linksToPass.append((linkdDictToPass))
+                logging.info("he: " + str(linkDict['he']))
             # print("linkes: ", len(links_list))
         try:
             book = jsonResponse['book'].replace(' ', '_')
@@ -323,6 +431,8 @@ def texts(request, slug=None):
                                'links': linksToPass,
                                "form": form, "indexNames": indexNames, "user_comments": user_comments,
                                "all_comments": all_comments})
+
+
 def contact(request):
     return render(request, "main/contact.html", {})
 

@@ -7,10 +7,19 @@ class Index(models.Model):
     json = models.JSONField()
 
     def __str__(self):
-      return self.url
+        return self.url
 
 
 class Texts(models.Model):
+    url = models.URLField(max_length=200)
+    json = models.JSONField()
+
+    def __str__(self):
+        return self.url
+
+
+class Commentators(models.Model):
+    main_text_url = models.ForeignKey(Texts, on_delete=models.CASCADE)
     url = models.URLField(max_length=200)
     json = models.JSONField()
 

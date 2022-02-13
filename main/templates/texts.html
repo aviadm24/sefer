@@ -8,7 +8,9 @@
       <div class="sidebar-heading">מפרשים</div>
       <div class="list-group list-group-flush">
         {% for link in links %}
-        <a class="list-group-item list-group-item-action bg-light" href="/api/texts/{{link.sourceRef}}?pad=0" target="_blank">{{link.sourceHeRef}}</a>
+        <a class="list-group-item list-group-item-action bg-light" href="/api/texts/{{link.sourceRef}}?pad=0" target="_blank">
+            {{link.sourceHeRef}} - {{link.lineIndex}}
+        </a>
         {%endfor%}
       </div>
     </div>
@@ -37,6 +39,10 @@
             <div id="text" dir="rtl">
                 {% for part in jsonResponse %}
                 <div class="text-right">{{part|safe}}</div>
+                <button class="" id="get_comment{{forloop.counter}}"
+                        onclick='get_comment_from_api("/api/texts/{{ref}}.{{forloop.counter}}?context=0&commentary=1", "/api/texts/{{ref}}", "commentary{{forloop.counter}}")'>
+                    c</button>
+                <div class="commentaryDiv" id="commentary{{forloop.counter}}" style="display: none"></div>
                 {%endfor%}
             </div>
             <div id="links">

@@ -47,6 +47,9 @@
 <script src="{% static 'ocr/js/editor.js' %}"></script>
 <script src="{% static 'main/js/getSelectionText.js' %}"></script>
 <script src="{% static 'main/js/getCalendar.js' %}"></script>
+<script src="{% static 'main/js/getSetSessionStorage.js' %}"></script>
+<script src="{% static 'main/js/connectLinksToText.js' %}"></script>
+<script src="{% static 'main/js/get_comment_from_api.js' %}"></script>
   <!-- Menu Toggle Script -->
     <script>
         $("#menu-toggle").click(function(e) {
@@ -89,41 +92,32 @@
 
     </script>
     <script>
-        $(document).ready(function() {
-            $('#by_row').multiselect({
-                selectAllValue: 'multiselect-all',
-                enableCaseInsensitiveFiltering: true,
-                enableFiltering: true,
-                maxHeight: '300',
-                buttonWidth: '235',
-                onChange: function(element, checked) {
-                    var brands = $('#by_row option:selected');
-                    var selected = [];
-                    $(brands).each(function(index, brand){
-                        selected.push($(this).val());
-                        document.getElementById("hidden_input").value = JSON.stringify(selected);
-                    });
-
-                    console.log(selected);
-                }
-            });
-        });
+    $(document).ready(function() {
+        bookList = [{% for book in books %}
+                        "{{book}}",
+                    {% endfor %}]
+        if(bookList){
+            setStorage("books", bookList);
+        }
+    });
     </script>
     <script>
-var options = {
-	data: [{% for book in books %}
-                "{{book}}",
-            {% endfor %}],
-    list: {
-        maxNumberOfElements: 10,
-        match: {
-            enabled: true
-            }
-        },
-    adjustWidth: false
-};
+    $(document).ready(function() {
+        var books = getStorage("books").split(",");
+        //console.log("books: "+books.slice(0, 19))
+        var options = {
+            data: books,
+            list: {
+                maxNumberOfElements: 10,
+                match: {
+                    enabled: true
+                    }
+                },
+            adjustWidth: false
+        };
 
-$("#search_title").easyAutocomplete(options);
+        $("#search_title").easyAutocomplete(options);
+    });
     </script>
 </body>
 </html>

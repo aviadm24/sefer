@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Index, Texts, MainCategories, Ycomment
+from .models import Index, Texts, MainCategories, Ycomment, Commentators
+
+
+class CommentatorsAdmin(admin.ModelAdmin):
+    pass
 
 
 class IndexAdmin(admin.ModelAdmin):
@@ -22,3 +26,4 @@ admin.site.register(Index, IndexAdmin)
 admin.site.register(Texts, TextsAdmin)
 admin.site.register(MainCategories, MainCategoriesAdmin)
 admin.site.register(Ycomment, YcommentAdmin)
+admin.site.register(Commentators, CommentatorsAdmin)

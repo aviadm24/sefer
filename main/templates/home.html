@@ -4,7 +4,7 @@
     <div class="container resizable">
     <p dir="rtl">מה אתה לומד עכשיו?</p>
         <a>ללוח לימוד יומי לחץ </a> <button id="getCalendar">כאן</button>
-        <div id="results_tab"></div>
+        <div id="results_tab" style="display: none"></div>
     {% with dict=jsonResponse template="treeTest.html" %}
      {% include template %}
     {% endwith %}
