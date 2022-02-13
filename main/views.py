@@ -1,4 +1,3 @@
-import logging
 from django.shortcuts import render, redirect, get_object_or_404
 import requests
 from .models import Index, Texts, MainCategories, TitleMeta, Links, Ycomment, Commentators
@@ -14,7 +13,8 @@ from .gematria import int_to_gematria
 import openpyxl
 import pandas as pd
 import numpy as np
-logging.basicConfig(filename='views.log', filemode='w', encoding='utf-8', level=logging.DEBUG)
+import logging
+logging.basicConfig(filename='views.log', filemode='w', level=logging.DEBUG)  # , encoding='utf-8' - has a bug
 logging.debug("test")
 
 
@@ -340,13 +340,13 @@ def get_comment(request):
     url = f"https://www.sefaria.org"+str(url)
     main_text_url = f"https://www.sefaria.org" + str(main_text_url)
     print(url)
-    logging.info("main_text_url: ", main_text_url)
+    # logging.info("main_text_url: ", main_text_url)
     text_instance = get_model(Texts, main_text_url)
     model = get_model(Commentators, url, main_text_url=text_instance)
-    logging.info("model: ", model)
+    # logging.info("model: ", model)
     jsonResponse = dict(model.json)
     print("jsonResponse: ", jsonResponse)
-    logging.info("jsonResponse: ", jsonResponse)
+    # logging.info("jsonResponse: ", jsonResponse)
     # content = requests.get(url)
     if 'error' in jsonResponse.keys():
         response = {
@@ -366,7 +366,7 @@ def get_comment(request):
 
 
 def texts_with_commentators(request, slug=None):
-    logging.info("slug: " + slug)
+    # logging.info("slug: " + slug)
     form = YcommentForm()
     linksToPass = []
     user_comments = []
@@ -401,7 +401,7 @@ def texts_with_commentators(request, slug=None):
                 else:
                     linkdDictToPass['lineIndex'] = 0
                 linksToPass.append((linkdDictToPass))
-                logging.info("he: " + str(linkDict['he']))
+                # logging.info("he: " + str(linkDict['he']))
             # print("linkes: ", len(links_list))
         try:
             book = jsonResponse['book'].replace(' ', '_')
