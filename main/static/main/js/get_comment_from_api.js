@@ -5,6 +5,7 @@ function func(id){
 }
 
 function get_comment_from_api (url_to_commentators, main_text_url, commentaryDivId) {
+    window.event.preventDefault();
     //e.preventDefault()
     // Making the AJAX Request
     console.log("commentaryDivId: "+commentaryDivId)
@@ -22,12 +23,13 @@ function get_comment_from_api (url_to_commentators, main_text_url, commentaryDiv
                 url: "/get_comment/",
                 // on success
                 success: function (response) {
-//                    console.log(response.commentary_names)
-                    if (response.error == true) {
-                        commentaryDiv.append('<div class="" id="">לא נמצאו פירושים על הפסקה הזאת</div>')
+                    console.log("response.error: "+response.error === true)
+                    if (response.error) {
+                        commentaryDiv.innerHTML='<div style="color:red">לא נמצאו פירושים על הפסקה הזאת</div>'
                     }
                     else {
                         var index = 1
+                        console.log("commentary_main_list: "+response.commentary_main_list)
                         for (var commentary_obj of response.commentary_main_list){
                             console.log("name: "+commentary_obj.hebrew_short_name)
 //                            commentText = gen_commentary_div(commentary_obj.text_list, commentaryDivId+'-'+commentary_obj.index_title)

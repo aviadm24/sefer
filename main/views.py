@@ -347,36 +347,45 @@ def get_comment(request):
     text_instance = get_model(Texts, main_text_url)
     model = get_model(Commentators, url, main_text_url=text_instance)
     jsonResponse = dict(model.json)
-    # print("jsonResponse: ", jsonResponse)
+    print("jsonResponse: ", jsonResponse)
     if 'error' in jsonResponse.keys():
-        response = {
-            'error': 'true'
-        }
+        try_new_url = '.'.join(url.split('.')[:-1])+'?context=0&commentary=1'
+        print("try_new_url: ", try_new_url)
+        model = get_model(Commentators, try_new_url, main_text_url=text_instance)
+        jsonResponse = dict(model.json)
+        print("jsonResponse: ", jsonResponse)
+        if 'error' in jsonResponse.keys():
+            response = {
+                'error': 'true'
+            }
+            return JsonResponse(response)
+        else:
+            commentary = jsonResponse['commentary']
     else:
-        he = jsonResponse['he']
+        # he = jsonResponse['he']
         # print(he)
         commentary = jsonResponse['commentary']
-        commentary_main_list = []
-        commentary_by_name_dict = {}
-        last_index_title = ''
-        for comm in commentary:
-            index_title = comm["index_title"]
-            if index_title != last_index_title:
-                if index_title != '' and commentary_by_name_dict != {}:
-                    commentary_main_list.append(commentary_by_name_dict)
-                print(commentary_by_name_dict)
-                commentary_by_name_dict = {}
-                # hebrew_long_name = comm["sourceHeRef"]
-                commentary_by_name_dict["index_title"] = index_title
-                commentary_by_name_dict["hebrew_short_name"] = comm["collectiveTitle"]["he"]
-                commentary_by_name_dict["text_list"] = []
-            commentary_by_name_dict["text_list"].append(comm["he"])
-            last_index_title = index_title
-        # filter_string = "Rashi"
-        # commentary_list = [comm for comm in commentary if filter_string in comm["ref"]]
-        response = {
-            'commentary_main_list': commentary_main_list
-        }
+    commentary_main_list = []
+    commentary_by_name_dict = {}
+    last_index_title = ''
+    for comm in commentary:
+        index_title = comm["index_title"]
+        if index_title != last_index_title:
+            if index_title != '' and commentary_by_name_dict != {}:
+                commentary_main_list.append(commentary_by_name_dict)
+            print(commentary_by_name_dict)
+            commentary_by_name_dict = {}
+            # hebrew_long_name = comm["sourceHeRef"]
+            commentary_by_name_dict["index_title"] = index_title
+            commentary_by_name_dict["hebrew_short_name"] = comm["collectiveTitle"]["he"]
+            commentary_by_name_dict["text_list"] = []
+        commentary_by_name_dict["text_list"].append(comm["he"])
+        last_index_title = index_title
+    # filter_string = "Rashi"
+    # commentary_list = [comm for comm in commentary if filter_string in comm["ref"]]
+    response = {
+        'commentary_main_list': commentary_main_list
+    }
     return JsonResponse(response)
 
 

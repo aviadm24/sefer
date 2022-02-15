@@ -80,11 +80,14 @@ myobj2 = json.dumps({
 #             print(c)
 #     sleep(randint(1, 3))
 
-with open("4a1.json") as f:
-   jsonResponse = json.load(f)
-he = jsonResponse['he']
+# with open("4a1.json") as f:
+#    jsonResponse = json.load(f)
+# he = jsonResponse['he']
 # print(he)
+jsonResponse = requests.get('https://www.sefaria.org/api/texts/Tur, Orach Chaim 85.1?context=0&commentary=1').json()
+print("jsonResponse: ", jsonResponse)
 commentary = jsonResponse['commentary']
+print("commentary: ", commentary)
 # commentary_name_set = set()
 commentary_main_list = []
 commentary_by_name_dict = {}
