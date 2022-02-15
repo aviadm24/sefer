@@ -159,6 +159,7 @@ def get_correct_page_range(primary_category, length):
 
         return page_list, hebrewLetterList
     else:
+        hebrewLetterList = [(num, int_to_gematria(str(num))) for num in range(1, length+1)]
         return range(1, length + 1), hebrewLetterList
 
 
@@ -309,12 +310,15 @@ def texts(request, slug=None):
             book = ""
             print("no book key in json response")
         try:
+            nested = False
+            if isinstance(jsonResponse["he"][0], list):
+                nested = True
             next, prev = get_next_prev(jsonResponse)
             length = jsonResponse['length']
             page_range, hebrewLetterList = get_correct_page_range(jsonResponse['primary_category'], length)
             indexNames = get_index_names()
             return render(request, "texts.html",
-                          {"jsonResponse": jsonResponse["he"], "ref": str(jsonResponse["ref"]), "next": next, 'prev': prev, "length": length,
+                          {"jsonResponse": jsonResponse["he"], "ref": str(jsonResponse["ref"]), "nested": nested, "next": next, 'prev': prev, "length": length,
                            "range": page_range, "hebrewLetterList": hebrewLetterList, 'book': book, 'links': linksToPass, "form": form,
                            "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
         except KeyError:
@@ -340,97 +344,40 @@ def get_comment(request):
     url = f"https://www.sefaria.org"+str(url)
     main_text_url = f"https://www.sefaria.org" + str(main_text_url)
     print(url)
-    # logging.info("main_text_url: ", main_text_url)
     text_instance = get_model(Texts, main_text_url)
     model = get_model(Commentators, url, main_text_url=text_instance)
-    # logging.info("model: ", model)
     jsonResponse = dict(model.json)
-    print("jsonResponse: ", jsonResponse)
-    # logging.info("jsonResponse: ", jsonResponse)
-    # content = requests.get(url)
+    # print("jsonResponse: ", jsonResponse)
     if 'error' in jsonResponse.keys():
         response = {
             'error': 'true'
         }
     else:
-        # print(jsonResponse.json().keys())
         he = jsonResponse['he']
-        print(he)
+        # print(he)
         commentary = jsonResponse['commentary']
-        filter_string = "Rashi"
-        commentary_list = [comm for comm in commentary if filter_string in comm["ref"]]
+        commentary_main_list = []
+        commentary_by_name_dict = {}
+        last_index_title = ''
+        for comm in commentary:
+            index_title = comm["index_title"]
+            if index_title != last_index_title:
+                if index_title != '' and commentary_by_name_dict != {}:
+                    commentary_main_list.append(commentary_by_name_dict)
+                print(commentary_by_name_dict)
+                commentary_by_name_dict = {}
+                # hebrew_long_name = comm["sourceHeRef"]
+                commentary_by_name_dict["index_title"] = index_title
+                commentary_by_name_dict["hebrew_short_name"] = comm["collectiveTitle"]["he"]
+                commentary_by_name_dict["text_list"] = []
+            commentary_by_name_dict["text_list"].append(comm["he"])
+            last_index_title = index_title
+        # filter_string = "Rashi"
+        # commentary_list = [comm for comm in commentary if filter_string in comm["ref"]]
         response = {
-            'commentary': commentary_list
+            'commentary_main_list': commentary_main_list
         }
     return JsonResponse(response)
-
-
-def texts_with_commentators(request, slug=None):
-    # logging.info("slug: " + slug)
-    form = YcommentForm()
-    linksToPass = []
-    user_comments = []
-    all_comments = []
-    if slug:
-        if request.user.is_authenticated:
-            user_comments = Ycomment.objects.filter(user=request.user).filter(url=request.build_absolute_uri())
-        else:
-            all_comments = Ycomment.objects.all()
-        url = "http://www.sefaria.org/api/texts/{}".format(slug)
-        model = get_model(Texts, url)
-        jsonResponse = dict(model.json)
-        # if len(jsonResponse['sectionNames']) > len(jsonResponse['sections']):
-        #     next_step_url = url+":1"
-        #     logging.info("new: ", next_step_url)
-        #     model = get_model(Texts, next_step_url)
-        #     jsonResponse = dict(model.json)
-        if 'ref' in jsonResponse.keys():
-            link_url = "http://www.sefaria.org/api/links/{}".format(jsonResponse['ref'])
-            link_model = get_model(Links, link_url)
-            links_list = link_model.json
-            for link in links_list:
-                linkdDictToPass = {}
-                linkDict = dict(link)
-                linkdDictToPass['sourceRef'] = linkDict['sourceRef']
-                linkdDictToPass['sourceHeRef'] = linkDict['sourceHeRef']
-                linkdDictToPass['he'] = linkDict['he']
-                if linkDict['index_title'].startswith('Rashi'):
-                    dibur_hamatchil = linkDict['he'].split('-')[0].strip()
-                    line_index = [index for index, x in enumerate(jsonResponse['he']) if re.search(dibur_hamatchil, x)][0]
-                    linkdDictToPass['lineIndex'] = line_index
-                else:
-                    linkdDictToPass['lineIndex'] = 0
-                linksToPass.append((linkdDictToPass))
-                # logging.info("he: " + str(linkDict['he']))
-            # print("linkes: ", len(links_list))
-        try:
-            book = jsonResponse['book'].replace(' ', '_')
-        except KeyError:
-            book = ""
-            print("no book key in json response")
-        try:
-            next, prev = get_next_prev(jsonResponse)
-            length = jsonResponse['length']
-            page_range, hebrewLetterList = get_correct_page_range(jsonResponse['primary_category'], length)
-            indexNames = get_index_names()
-            return render(request, "texts.html",
-                          {"jsonResponse": jsonResponse["he"], "next": next, 'prev': prev, "length": length,
-                           "range": page_range, "hebrewLetterList": hebrewLetterList, 'book': book, 'links': linksToPass, "form": form,
-                           "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
-        except KeyError:
-            next, prev = get_next_prev(jsonResponse)
-            print("jsonResponse.keys(): ", jsonResponse.keys())
-            indexNames = get_index_names()
-            if "he" in jsonResponse.keys():
-                return render(request, "texts.html",
-                              {"jsonResponse": jsonResponse["he"], 'book': book, 'next': next, 'prev': prev, 'links': linksToPass,
-                               "form": form, "indexNames": indexNames, "user_comments": user_comments, "all_comments": all_comments})
-            else:
-                return render(request, "texts.html",
-                              {"jsonResponse": jsonResponse, 'book': book, 'next': next, 'prev': prev,
-                               'links': linksToPass,
-                               "form": form, "indexNames": indexNames, "user_comments": user_comments,
-                               "all_comments": all_comments})
 
 
 def contact(request):

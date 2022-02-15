@@ -46,13 +46,13 @@ myobj2 = json.dumps({
   "type": "text"
 })
 
-response = requests.post(url, data=myobj)
-# print(response.content)
-data = response.json()
-print(data)
-print(data['hits']['total'])
-for i, hit in enumerate(data['hits']['hits']):
-    print(i, ' - ', hit['_source']['heRef'])
+# response = requests.post(url, data=myobj)
+# # print(response.content)
+# data = response.json()
+# print(data)
+# print(data['hits']['total'])
+# for i, hit in enumerate(data['hits']['hits']):
+#     print(i, ' - ', hit['_source']['heRef'])
 
 
 
@@ -79,3 +79,34 @@ for i, hit in enumerate(data['hits']['hits']):
 #         for c in commentary:
 #             print(c)
 #     sleep(randint(1, 3))
+
+with open("4a1.json") as f:
+   jsonResponse = json.load(f)
+he = jsonResponse['he']
+# print(he)
+commentary = jsonResponse['commentary']
+# commentary_name_set = set()
+commentary_main_list = []
+commentary_by_name_dict = {}
+last_index_title = ''
+for comm in commentary:
+    index_title = comm["index_title"]
+    if index_title != last_index_title:
+        if index_title != '' and commentary_by_name_dict != {}:
+            commentary_main_list.append(commentary_by_name_dict)
+        print(commentary_by_name_dict)
+        commentary_by_name_dict = {}
+        # hebrew_long_name = comm["sourceHeRef"]
+        commentary_by_name_dict["index_title"] = index_title
+        commentary_by_name_dict["hebrew_short_name"] = comm["collectiveTitle"]["he"]
+        commentary_by_name_dict["text_list"] = []
+    commentary_by_name_dict["text_list"].append(comm["he"])
+    last_index_title = index_title
+
+print(commentary_main_list[0])
+# filter_string = "Rashi"
+# commentary_list = [comm for comm in commentary if filter_string in comm["ref"]]
+response = {
+   'commentary_names': list(commentary_by_name_dict.keys()),
+   'commentary_dict': commentary_by_name_dict
+}
