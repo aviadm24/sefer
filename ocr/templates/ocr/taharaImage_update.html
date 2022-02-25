@@ -1,0 +1,30 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+<div class="container">
+    <ul>
+        <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+<!--        <input type="file" name="image">-->
+        <input type="submit" value="שלח">
+        <div id="errors">
+        {{ form.name.errors }}
+        {{ form.non_field_errors}}
+        </div>
+        </form>
+
+        <hr/>
+
+    </ul>
+
+<!--    <h1>הערות</h1>-->
+<!--    <ul>-->
+<!--    {% for comment in object_list %}-->
+<!--        <li>{{ comment.updated_at|date }} - {{ comment.comment }}</li>-->
+<!--    {% empty %}-->
+<!--        <li>No articles yet.</li>-->
+<!--    {% endfor %}-->
+<!--    </ul>-->
+</div>
+{% endblock %}

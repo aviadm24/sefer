@@ -194,6 +194,7 @@ def home(request):
         mainCategories.url = url
         mainCategories.catJson = json.dumps(indexNames)
         mainCategories.save()
+    print(indexNames)
     return render(request, "home.html", {"indexNames": indexNames, "books": bookNameList})
 
 

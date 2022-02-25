@@ -20,7 +20,7 @@ from . import views
 urlpatterns = [
     path('', views.home),
     path('image_upload/', views.image_upload, name='upload'),
-    path('get_params/', views.get_params),
-    path('ocr_output/', views.ocr_output),
-    path('merge/', views.merge)
+    path('upload_image/', views.TaharaImageCreateView, name='TaharaImageCreateView'),
+    path('list_image/', views.TaharaImageListView.as_view(), name='TaharaImageListView'),
+    path('update_image/<slug:pk>/', views.TaharaImageUpdateView.as_view(), name='TaharaImageUpdateView'),
 ]

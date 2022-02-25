@@ -1,0 +1,35 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h3>הועלו סה"כ {{number_of_edim_uploaded}} עדים</h3>
+    <h3><a href="{% url 'TaharaImageCreateView' %}">פסיקה על עד חדש</a></h3>
+    <ul>
+        <!-- Iterate over object_list -->
+        {% for object in object_list %}
+        <!-- Display Objects -->
+        <li>{{ object.rabbi_name }}</li>
+<!--        <li>{{ object.first_pesak }}</li>-->
+        <img src="data:image/png;base64,{{object.logo}}">
+        <p><a href="{% url 'TaharaImageUpdateView' object.id %}">פסיקה דרך המסך</a></p>
+
+        <hr/>
+        <!-- If objet_list is empty  -->
+        {% empty %}
+        <li>אין עדים לפסוק עליהם</li>
+        {% endfor %}
+        {% if additional_explanation %}
+        <p>{{additional_explanation}}</p>
+        {% endif %}
+    </ul>
+
+<!--    <h1>הערות</h1>-->
+<!--    <ul>-->
+<!--    {% for comment in object_list %}-->
+<!--        <li>{{ comment.updated_at|date }} - {{ comment.comment }}</li>-->
+<!--    {% empty %}-->
+<!--        <li>No articles yet.</li>-->
+<!--    {% endfor %}-->
+<!--    </ul>-->
+</div>
+{% endblock %}
