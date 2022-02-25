@@ -1,7 +1,6 @@
 __pycache__/
 db.sqlite3
 *.pyc
-migrations/
 .idea
 env/
 sendgrid.env

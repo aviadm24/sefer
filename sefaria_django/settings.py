@@ -30,10 +30,10 @@ else:
 # SECURITY WARNING: don't run with debug turned on in production!
 ipaddress = socket.gethostbyname(socket.gethostname())
 print('ip_address:', ipaddress)
-# if ipaddress.startswith('172'):
-#     DEBUG = False
-# else:
-DEBUG = True
+if ipaddress.startswith('172'):
+    DEBUG = False
+else:
+    DEBUG = True
 
 # ALLOWED_HOSTS = ["*"]
 ALLOWED_HOSTS = ["http://www.toracomments.com/", "http://127.0.0.1:8000/"]
