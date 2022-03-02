@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from .models import TaharaImage
+from cloudinary.forms import CloudinaryJsFileField, CloudinaryUnsignedJsFileField
 
 
 class TaharaImageForm(ModelForm):
@@ -16,4 +17,10 @@ class TaharaImageForm(ModelForm):
             "first_pesak": "פסק",
             "logo_image": "העלה תמונה",
             "second_pesak": "פסק",
+            "image": "צד עיקרי",
+            "image2": "צד שני",
         }
+
+
+class TaharaImageDirectForm(TaharaImageForm):
+    image = CloudinaryJsFileField()

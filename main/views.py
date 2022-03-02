@@ -188,13 +188,13 @@ def home(request):
             subDict = dict(zip(heTitles, titles))
             for heTitle in heTitles:
                 bookNameList.append(heTitle)
-    print(bookNameList[:10])
+    # print(bookNameList[:10])
     if not MainCategories.objects.filter(url=url).exists():
         mainCategories = MainCategories()
         mainCategories.url = url
         mainCategories.catJson = json.dumps(indexNames)
         mainCategories.save()
-    print(indexNames)
+    # print(indexNames)
     return render(request, "home.html", {"indexNames": indexNames, "books": bookNameList})
 
 

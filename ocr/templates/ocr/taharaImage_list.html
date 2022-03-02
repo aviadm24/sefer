@@ -1,4 +1,5 @@
 {% extends "main/base.html" %}
+{% load cloudinary %}
 
 {% block content %}
 <div class="container">
@@ -10,8 +11,18 @@
         <!-- Display Objects -->
         <li>{{ object.rabbi_name }}</li>
 <!--        <li>{{ object.first_pesak }}</li>-->
-        <img src="data:image/png;base64,{{object.logo}}">
-        <p><a href="{% url 'TaharaImageUpdateView' object.id %}">פסיקה דרך המסך</a></p>
+        <p>לחץ כדי לראות תמונה גדולה עם אפשרות להגדלה</p>
+        <a href="{{ object.image.url }}" target="_blank" class="public_id_link">
+            צד א
+            <div class='public_id'>{{ object.image.public_id }} - {{ object.title }}</div>
+            {% cloudinary object.image THUMBNAIL %}
+          </a>
+        <a href="{{ object.image2.url }}" target="_blank" class="public_id_link">
+            צד ב
+            <div class='public_id'>{{ object.image2.public_id }} - {{ object.title }}</div>
+            {% cloudinary object.image2 THUMBNAIL %}
+          </a>
+        <p><a href="{% url 'TaharaImageUpdateView' object.id %}">לפסיקה דרך המסך</a></p>
 
         <hr/>
         <!-- If objet_list is empty  -->
@@ -22,14 +33,5 @@
         <p>{{additional_explanation}}</p>
         {% endif %}
     </ul>
-
-<!--    <h1>הערות</h1>-->
-<!--    <ul>-->
-<!--    {% for comment in object_list %}-->
-<!--        <li>{{ comment.updated_at|date }} - {{ comment.comment }}</li>-->
-<!--    {% empty %}-->
-<!--        <li>No articles yet.</li>-->
-<!--    {% endfor %}-->
-<!--    </ul>-->
 </div>
 {% endblock %}

@@ -21,6 +21,9 @@ from io import StringIO
 from PIL import Image
 import json
 from .ocr_functions import data, word_list_dict, heb_digit
+from cloudinary.forms import cl_init_js_callbacks
+import six
+MIN_WAITING_TIME = 0
 
 
 @login_required(redirect_field_name='account_login')
@@ -34,7 +37,8 @@ def TaharaImageCreateView(request):
             tahara_image = form.save(commit=False)
             tahara_image.rabbi_name = request.user
             tahara_image.save()
-            return render(request, 'ocr/taharaImage_list.html')
+            # return render(request, 'ocr/taharaImage_list.html')
+            return redirect('TaharaImageListView')
         else:
             print("errors: ", form.errors)
             return render(request, 'ocr/taharaImage_create.html', {'form': form})
@@ -64,7 +68,7 @@ class TaharaImageListView(ListView):
         qs = TaharaImage.objects.filter(rabbi_name=self.request.user)
         number_of_edim_uploaded = context['number_of_edim_uploaded'] = qs.count()
         qs = TaharaImage.objects.filter(rabbi_name=self.request.user). \
-            filter(release_date__lte=datetime.now() - timedelta(days=30))
+            filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(second_pesak__exact=None)
         if number_of_edim_uploaded > qs.count():
             context['additional_explanation'] = 'עדיין לא עבר הזמן המוגדר במערכת למרווח בין הפסיקה הראשונה והשניה לגבי עדים'
         # form = TaharaImageForm()
@@ -73,12 +77,14 @@ class TaharaImageListView(ListView):
 
     def get_queryset(self):
         qs = TaharaImage.objects.filter(rabbi_name=self.request.user).\
-            filter(release_date__lte=datetime.now() - timedelta(days=0))
+            filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(second_pesak__exact=None)
         for t_image in qs:
-            logo = t_image.logo
-            t_image.logo = logo[2:-1]
+            # logo = t_image.logo
+            # t_image.logo = logo[2:-1]
             t_image.first_pesak = TaharaImage.pesak_in_hebrew(t_image.first_pesak)
-            # print("logo: ", t_image.logo)
+            print("second_pesak: ", t_image.second_pesak)
+            if t_image.second_pesak:
+                t_image.second_pesak = TaharaImage.pesak_in_hebrew(t_image.second_pesak)
         return qs
 
 
@@ -145,3 +151,70 @@ def ocr_output(request):
 
     return render(request, 'ocr/ocr_output.html')
 
+
+def filter_nones(d):
+    return dict((k, v) for k, v in six.iteritems(d) if v is not None)
+
+
+def cloudinary_list(request):
+    defaults = dict(format="jpg", height=150, width=150)
+    defaults["class"] = "thumbnail inline"
+
+    # The different transformations to present
+    samples = [
+        dict(crop="fill", radius=10),
+        dict(crop="scale"),
+        dict(crop="fit", format="png"),
+    ]
+    samples = [filter_nones(dict(defaults, **sample)) for sample in samples]
+    for img in TaharaImage.objects.all():
+        print(img.image)
+    return render(request, 'ocr/cloudinary_list.html', dict(photos=TaharaImage.objects.all(), samples=samples))
+
+
+def upload(request):
+    unsigned = request.GET.get("unsigned") == "true"
+
+    if (unsigned):
+        # For the sake of simplicity of the sample site, we generate the preset on the fly.
+        # It only needs to be created once, in advance.
+        try:
+            api.upload_preset(PhotoUnsignedDirectForm.upload_preset_name)
+        except api.NotFound:
+            api.create_upload_preset(name=PhotoUnsignedDirectForm.upload_preset_name, unsigned=True,
+                                     folder="preset_folder")
+
+    direct_form = PhotoUnsignedDirectForm() if unsigned else PhotoDirectForm()
+    context = dict(
+        # Form demonstrating backend upload
+        backend_form=PhotoForm(),
+        # Form demonstrating direct upload
+        direct_form=direct_form,
+        # Should the upload form be unsigned
+        unsigned=unsigned,
+    )
+    # When using direct upload - the following call is necessary to update the
+    # form's callback url
+    cl_init_js_callbacks(context['direct_form'], request)
+
+    if request.method == 'POST':
+        # Only backend upload should be posting here
+        form = PhotoForm(request.POST, request.FILES)
+        context['posted'] = form.instance
+        if form.is_valid():
+            # Uploads image and creates a model instance for it
+            form.save()
+
+    return render(request, 'upload.html', context)
+
+
+def direct_upload_complete(request):
+    form = PhotoDirectForm(request.POST)
+    if form.is_valid():
+        # Create a model instance for uploaded image using the provided data
+        form.save()
+        ret = dict(photo_id=form.instance.id)
+    else:
+        ret = dict(errors=form.errors)
+
+    return HttpResponse(json.dumps(ret), content_type='application/json')

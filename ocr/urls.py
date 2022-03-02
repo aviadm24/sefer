@@ -22,5 +22,6 @@ urlpatterns = [
     path('image_upload/', views.image_upload, name='upload'),
     path('upload_image/', views.TaharaImageCreateView, name='TaharaImageCreateView'),
     path('list_image/', views.TaharaImageListView.as_view(), name='TaharaImageListView'),
+    # path('list_image/', views.cloudinary_list, name='TaharaImageListView'),
     path('update_image/<slug:pk>/', views.TaharaImageUpdateView.as_view(), name='TaharaImageUpdateView'),
 ]
