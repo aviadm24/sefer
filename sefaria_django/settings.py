@@ -30,6 +30,11 @@ if os.path.exists('secret_key.txt'):
 else:
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
+cloudinary.config(
+  cloud_name=os.environ.get('cloud_name', ''),
+  api_key=os.environ.get('api_key', ''),
+  api_secret=os.environ.get('api_secret', '')
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 ipaddress = socket.gethostbyname(socket.gethostname())
