@@ -257,4 +257,6 @@ LOGGING = {
 }
 
 # Activate Django-Heroku.
-django_heroku.settings(locals())
+# https://stackoverflow.com/questions/18920428/django-logging-on-heroku
+# fix for logging on heroku
+django_heroku.settings(locals(), logging=False)
