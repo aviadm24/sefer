@@ -30,10 +30,15 @@ if os.path.exists('secret_key.txt'):
 else:
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
+# cloudinary.config(
+#   cloud_name=os.environ.get('cloud_name', ''),
+#   api_key=os.environ.get('api_key', ''),
+#   api_secret=os.environ.get('api_secret', '')
+# )
 cloudinary.config(
-  cloud_name=os.environ.get('cloud_name', ''),
-  api_key=os.environ.get('api_key', ''),
-  api_secret=os.environ.get('api_secret', '')
+    cloud_name="heodokrl4",
+    api_key="255666589969982",
+    api_secret="9fyWbC84b_u8iwf_WfFEbVw7RuQ"
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!

@@ -61,6 +61,7 @@ def TaharaImageCreateView(request):
 class TaharaImageListView(ListView):
     model = TaharaImage
     paginate_by = 100  # if pagination is desired
+    template_name = 'ocr/taharaImage_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
