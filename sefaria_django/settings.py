@@ -36,18 +36,18 @@ cloudinary.config(
   api_key=os.environ.get('api_key', ''),
   api_secret=os.environ.get('api_secret', '')
 )
-creds = []
-try:
-    with open("cloudinary_config.txt", "r") as f:
-        for line in f.readlines():
-            creds.append(line)
-except FileNotFoundError:
-    print("no cloudinary_config.txt file found!")
-cloudinary.config(
-    cloud_name=creds[0].strip(),
-    api_key=creds[1].strip(),
-    api_secret=creds[2].strip()
-)
+# creds = []
+# try:
+#     with open("cloudinary_config.txt", "r") as f:
+#         for line in f.readlines():
+#             creds.append(line)
+# except FileNotFoundError:
+#     print("no cloudinary_config.txt file found!")
+# cloudinary.config(
+#     cloud_name=creds[0].strip(),
+#     api_key=creds[1].strip(),
+#     api_secret=creds[2].strip()
+# )
 # SECURITY WARNING: don't run with debug turned on in production!
 ipaddress = socket.gethostbyname(socket.gethostname())
 print('ip_address:', ipaddress)
