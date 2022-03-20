@@ -19,8 +19,8 @@ from django.views.generic.base import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', include("main.urls")),
-    # path('ocr/', include("ocr.urls")),
+    path('', include("main.urls")),
+    path('ocr/', include("ocr.urls")),
     path('accounts/', include('allauth.urls')),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain"))
 ]
