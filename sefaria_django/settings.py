@@ -30,12 +30,24 @@ if os.path.exists('secret_key.txt'):
 else:
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
+
 cloudinary.config(
   cloud_name=os.environ.get('cloud_name', ''),
   api_key=os.environ.get('api_key', ''),
   api_secret=os.environ.get('api_secret', '')
 )
-
+creds = []
+try:
+    with open("cloudinary_config.txt", "r") as f:
+        for line in f.readlines():
+            creds.append(line)
+except FileNotFoundError:
+    print("no cloudinary_config.txt file found!")
+cloudinary.config(
+    cloud_name=creds[0].strip(),
+    api_key=creds[1].strip(),
+    api_secret=creds[2].strip()
+)
 # SECURITY WARNING: don't run with debug turned on in production!
 ipaddress = socket.gethostbyname(socket.gethostname())
 print('ip_address:', ipaddress)
@@ -96,12 +108,13 @@ if EMAIL_HOST == '':
         with open("mailgun.txt", "r") as f:
             for line in f.readlines():
                 creds.append(line)
-        EMAIL_HOST = creds[0]
-        EMAIL_PORT = creds[1]
-        EMAIL_HOST_USER = creds[2]
-        EMAIL_HOST_PASSWORD = creds[3]
+        EMAIL_HOST = creds[0].strip()
+        EMAIL_PORT = creds[1].strip()
+        EMAIL_HOST_USER = creds[2].strip()
+        EMAIL_HOST_PASSWORD = creds[3].strip()
     except FileNotFoundError:
         print("no mailgun.txt file found!")
+DEFAULT_FROM_EMAIL = 'toracomments@mail.com'
 # print("EMAIL_HOST: ", EMAIL_HOST)
 LOGIN_REDIRECT_URL = "/"
 

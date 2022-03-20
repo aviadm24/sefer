@@ -1,8 +1,9 @@
 __pycache__/
-db.sqlite3
+overflow/db.sqlite3
 *.pyc
 .idea
 env/
 sendgrid.env
 mailgun.txt
 secret_key.txt
+cloudinary_config.txt

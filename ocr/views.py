@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
 import pytesseract
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt
@@ -13,6 +14,7 @@ from django.views.generic.list import ListView
 from datetime import timedelta, datetime
 from django.views.generic import TemplateView, CreateView
 from .models import TaharaImage
+from django.contrib.auth.models import User
 from .forms import TaharaImageForm
 from django.utils import timezone
 from django.urls import reverse_lazy
@@ -23,7 +25,29 @@ import json
 from .ocr_functions import data, word_list_dict, heb_digit
 from cloudinary.forms import cl_init_js_callbacks
 import six
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+
 MIN_WAITING_TIME = 0
+
+
+def send_email(user):
+    subject = "מחקר מראות מכון פועה"
+    from_email, to = None, user.email
+    text_content = 'Text'
+    html_content = render_to_string(
+        'ocr/email.html')
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+    print('sending mail')
+    # send_mail(
+    #     'מחקר מראות מכון פועה',
+    #     'Here is the message.',
+    #     'from@example.com',
+    #     [user.email],
+    #     fail_silently=False,
+    # )
 
 
 @login_required(redirect_field_name='account_login')
@@ -44,6 +68,22 @@ def TaharaImageCreateView(request):
             return render(request, 'ocr/taharaImage_create.html', {'form': form})
     else:
         form = TaharaImageForm()
+        for user in User.objects.all():
+            print('user name: ', user.email)
+            qs = TaharaImage.objects.filter(rabbi_name=user). \
+            filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(second_pesak__exact=None)
+            print('yesterdy: ', timezone.now()-timedelta(days=1))
+            print('last login: ', user.last_login)
+            print('qs.count() : ', qs.count())
+            if qs.count() > 0:
+                if user.last_login:
+                    if user.last_login < timezone.now()-timedelta(days=1):
+                        # send_email(user)
+                        user.last_login = timezone.now()
+                        user.save(update_fields=['last_login'])
+                else:
+                    user.last_login = timezone.now()
+                    user.save(update_fields=['last_login'])
     return render(request, 'ocr/taharaImage_create.html', {'form': form})
 
 # class TaharaImageCreateView(CreateView):
