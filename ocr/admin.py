@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TaharaImage
+from .models import TaharaImage, Answers, Light, CameraDevice, CameraConfig, Comment
 import base64
 from django.utils.html import format_html
 
@@ -13,3 +13,8 @@ class TaharaImageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(TaharaImage, TaharaImageAdmin)
+admin.site.register(Answers)
+admin.site.register(Light)
+admin.site.register(CameraDevice)
+admin.site.register(CameraConfig)
+admin.site.register(Comment)

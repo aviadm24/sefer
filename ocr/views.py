@@ -61,8 +61,8 @@ def TaharaImageCreateView(request):
             tahara_image = form.save(commit=False)
             tahara_image.rabbi_name = request.user
             tahara_image.save()
-            # return render(request, 'ocr/taharaImage_list.html')
-            return redirect('TaharaImageListView')
+            return render(request, 'ocr/taharaImage_list.html')
+            # return redirect('TaharaImageListView')
         else:
             print("errors: ", form.errors)
             return render(request, 'ocr/taharaImage_create.html', {'form': form})
@@ -100,38 +100,30 @@ def TaharaImageCreateView(request):
 
 class TaharaImageListView(ListView):
     model = TaharaImage
-    paginate_by = 100  # if pagination is desired
+    # paginate_by = 100  # if pagination is desired
     template_name = 'ocr/taharaImage_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['now'] = timezone.now()
+        print('now:', context['now'])
         qs = TaharaImage.objects.filter(rabbi_name=self.request.user)
         number_of_edim_uploaded = context['number_of_edim_uploaded'] = qs.count()
-        qs = TaharaImage.objects.filter(rabbi_name=self.request.user). \
-            filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(second_pesak__exact=None)
+        print('number_of_edim_uploaded:', number_of_edim_uploaded)
         if number_of_edim_uploaded > qs.count():
             context['additional_explanation'] = 'עדיין לא עבר הזמן המוגדר במערכת למרווח בין הפסיקה הראשונה והשניה לגבי עדים'
-        # form = TaharaImageForm()
-        # context['form'] = form
+        print('qs.count(): ', qs.count())
         return context
 
     def get_queryset(self):
         qs = TaharaImage.objects.filter(rabbi_name=self.request.user).\
             filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(second_pesak__exact=None)
-        for t_image in qs:
-            # logo = t_image.logo
-            # t_image.logo = logo[2:-1]
-            t_image.first_pesak = TaharaImage.pesak_in_hebrew(t_image.first_pesak)
-            print("second_pesak: ", t_image.second_pesak)
-            if t_image.second_pesak:
-                t_image.second_pesak = TaharaImage.pesak_in_hebrew(t_image.second_pesak)
         return qs
 
 
 class TaharaImageUpdateView(UpdateView):
     model = TaharaImage
-    fields = ['second_pesak']  # fields / if you want to select all fields, use "__all__"
+    fields = ['second_pesak', 'user_agent']  # fields / if you want to select all fields, use "__all__"
     template_name = 'ocr/taharaImage_update.html'
     success_url = '/ocr/list_image'
 

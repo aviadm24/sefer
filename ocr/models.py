@@ -14,21 +14,36 @@ def make_choices(model):
 class Answers(models.Model):
     choice = models.CharField(max_length=250)
 
+    def __str__(self):
+        return self.choice
+
 
 class Light(models.Model):
     choice = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.choice
 
 
 class CameraDevice(models.Model):
     choice = models.CharField(max_length=250)
 
+    def __str__(self):
+        return self.choice
+
 
 class CameraConfig(models.Model):
     choice = models.CharField(max_length=250)
 
+    def __str__(self):
+        return self.choice
+
 
 class Comment(models.Model):
     choice = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.choice
 
 
 class TaharaImage(models.Model):
@@ -78,24 +93,27 @@ class TaharaImage(models.Model):
     def __str__(self):
         return str(self.id)
 
-    @staticmethod
-    def pesak_in_hebrew(pesak):
-        for a in TaharaImage.ANSWERS:
-            if a[0] == pesak:
-                return a[1]
+    # @staticmethod
+    # def pesak_in_hebrew(pesak):
+    #     for a in TaharaImage.ANSWERS:
+    #         if a[0] == pesak:
+    #             return a[1]
     #  https://bhch.github.io/posts/2018/12/django-how-to-editmanipulate-uploaded-images-on-the-fly-before-saving/
 
     def save(self, *args, **kwargs):
         image1 = image_to_color_percentage(self.image)
         image2 = image_to_color_percentage(self.image2)
         self.color_percentage = dict(image1=image1, image2=image2)
+        print("image size: ", self.color_percentage)
         super().save(*args, **kwargs)
 
 
 def image_to_color_percentage(image_file):
     img = Image.open(image_file)
     size = w, h = img.size
-    pix_val = list(img.getdata())
+    # pix_val = list(img.getdata())
+    # for pix in pix_val:
+    #     print(pix)
     # data = img.load()
     # colors = []
     # for x in range(w):
@@ -103,7 +121,7 @@ def image_to_color_percentage(image_file):
     #         color = data[x, y]
     #         hex_color = '#' + ''.join([hex(c)[2:].rjust(2, '0') for c in color])
     #         colors.append(hex_color)
-    return dict(size=size, pix_val=pix_val)
+    return dict(size=size)  # , pix_val=pix_val
 
 # https://stackoverflow.com/questions/44489375/django-have-admin-take-image-file-but-store-it-as-a-base64-string
 # @receiver(post_save, sender=TaharaImage)
