@@ -50,6 +50,22 @@ def send_email(user):
     # )
 
 
+def image_to_color_percentage(image_file):
+    img = Image.open(image_file)
+    size = w, h = img.size
+    # pix_val = list(img.getdata())
+    # for pix in pix_val:
+    #     print(pix)
+    # data = img.load()
+    # colors = []
+    # for x in range(w):
+    #     for y in range(h):
+    #         color = data[x, y]
+    #         hex_color = '#' + ''.join([hex(c)[2:].rjust(2, '0') for c in color])
+    #         colors.append(hex_color)
+    return dict(size=size)  # , pix_val=pix_val
+
+
 @login_required(redirect_field_name='account_login')
 def TaharaImageCreateView(request):
     # print("method: ", request.method)
@@ -60,6 +76,10 @@ def TaharaImageCreateView(request):
         if form.is_valid():
             tahara_image = form.save(commit=False)
             tahara_image.rabbi_name = request.user
+            image1 = image_to_color_percentage(tahara_image.image)
+            image2 = image_to_color_percentage(tahara_image.image2)
+            tahara_image.color_percentage = dict(image1=image1, image2=image2)
+            print("image size: ", tahara_image.color_percentage)
             tahara_image.save()
             return render(request, 'ocr/taharaImage_list.html')
             # return redirect('TaharaImageListView')

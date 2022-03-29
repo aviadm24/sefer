@@ -5,6 +5,7 @@ from django.db.models.signals import post_save, m2m_changed
 from cloudinary.models import CloudinaryField
 from PIL import Image
 from collections import Counter
+# https://stackoverflow.com/questions/34548768/django-no-such-table-exception
 
 
 def make_choices(model):
@@ -61,8 +62,7 @@ class TaharaImage(models.Model):
     logo = models.TextField(blank=True)
     image = CloudinaryField('image', default=None)  # models.ImageField(null=True, blank=True, upload_to='logo')
     image2 = CloudinaryField('image2', default=None)
-    showed_to = models.CharField(max_length=250, null=True, blank=True,
-                                 choices=((user.username, user.username) for user in User.objects.all()))
+    showed_to = models.CharField(max_length=250, null=True, blank=True)  # ,choices=((user.username, user.username) for user in User.objects.all()))
     second_pesak = models.ForeignKey('Answers', related_name="%(app_label)s_%(class)s_second_pesak", blank=True,
                                     null=True, default='', on_delete=models.SET_NULL, help_text="", verbose_name="פסק")
     user_agent = models.CharField(max_length=1000, null=True, blank=True)
@@ -101,10 +101,10 @@ class TaharaImage(models.Model):
     #  https://bhch.github.io/posts/2018/12/django-how-to-editmanipulate-uploaded-images-on-the-fly-before-saving/
 
     def save(self, *args, **kwargs):
-        image1 = image_to_color_percentage(self.image)
-        image2 = image_to_color_percentage(self.image2)
-        self.color_percentage = dict(image1=image1, image2=image2)
-        print("image size: ", self.color_percentage)
+        # image1 = image_to_color_percentage(self.image)
+        # image2 = image_to_color_percentage(self.image2)
+        # self.color_percentage = dict(image1=image1, image2=image2)
+        # print("image size: ", self.color_percentage)
         super().save(*args, **kwargs)
 
 

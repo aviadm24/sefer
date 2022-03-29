@@ -1,8 +1,10 @@
 __pycache__/
-overflow/db.sqlite3
+overflow/
+db.sqlite3
 *.pyc
 .idea
-env/
+venv/
+migrations/
 sendgrid.env
 mailgun.txt
 secret_key.txt
