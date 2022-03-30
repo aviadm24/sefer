@@ -28,3 +28,10 @@
 <!--    </ul>-->
 </div>
 {% endblock %}
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $("#id_user_agent").val(window.navigator.userAgent);
+        });
+    </script>
+{% endblock %}

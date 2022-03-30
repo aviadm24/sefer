@@ -176,6 +176,8 @@ def get_next_prev(jsonResponse):
 
 
 def home(request):
+    # for per in request.user.get_all_permissions():
+    #     print('per: ', per)
     url = "http://www.sefaria.org/api/index"
     model = get_model(Index, url)
     indexNames = get_index_names(model=model)

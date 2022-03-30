@@ -18,7 +18,8 @@ from django.contrib.auth.models import User
 from .forms import TaharaImageForm
 from django.utils import timezone
 from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from io import StringIO
 from PIL import Image
 import json
@@ -28,7 +29,7 @@ import six
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 
-MIN_WAITING_TIME = 0
+MIN_WAITING_TIME = 1
 
 
 def send_email(user):
@@ -66,7 +67,8 @@ def image_to_color_percentage(image_file):
     return dict(size=size)  # , pix_val=pix_val
 
 
-@login_required(redirect_field_name='account_login')
+# @login_required(redirect_field_name='account_login')
+@permission_required('ocr.add_taharaimage', raise_exception=True)  # , login_url='/accounts/login/'
 def TaharaImageCreateView(request):
     # print("method: ", request.method)
     if request.method == 'POST':
@@ -98,7 +100,7 @@ def TaharaImageCreateView(request):
             if qs.count() > 0:
                 if user.last_login:
                     if user.last_login < timezone.now()-timedelta(days=1):
-                        # send_email(user)
+                        send_email(user)
                         user.last_login = timezone.now()
                         user.save(update_fields=['last_login'])
                 else:
@@ -118,7 +120,8 @@ def TaharaImageCreateView(request):
     #     return kwargs
 
 
-class TaharaImageListView(ListView):
+class TaharaImageListView(PermissionRequiredMixin, ListView):
+    permission_required = 'ocr.add_taharaimage'
     model = TaharaImage
     # paginate_by = 100  # if pagination is desired
     template_name = 'ocr/taharaImage_list.html'
@@ -141,7 +144,8 @@ class TaharaImageListView(ListView):
         return qs
 
 
-class TaharaImageUpdateView(UpdateView):
+class TaharaImageUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'ocr.add_taharaimage'
     model = TaharaImage
     fields = ['second_pesak', 'user_agent']  # fields / if you want to select all fields, use "__all__"
     template_name = 'ocr/taharaImage_update.html'
