@@ -1,10 +1,11 @@
-{% extends "main/base.html" %}
+{% extends "ocr/base.html" %}
 {% load cloudinary %}
 
 {% block content %}
 <div class="container">
-    <h3>הועלו סה"כ {{number_of_edim_uploaded}} עדים</h3>
-    <h3><a href="{% url 'TaharaImageCreateView' %}">פסיקה על עד חדש</a></h3>
+    <h4 style="padding: 3rem">רשימת מראות שעדיין לא פסקו עליהם פעם שניה</h4>
+    <h4>הועלו סה"כ {{number_of_edim_uploaded}} עדים</h4>
+    <h4><a href="{% url 'TaharaImageCreateView' %}">להעלאה תמונות של מראה חדש</a></h4>
     <ul>
         <!-- Iterate over object_list -->
         {% for object in object_list %}

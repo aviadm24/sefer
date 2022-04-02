@@ -1,24 +1,26 @@
-{% extends "main/base.html" %}
+{% extends "ocr/base.html" %}
 
 {% block content %}
+<div class="container">
+    <h4 style="padding: 3rem"> טופס העלאת תמונות של מראות ופסיקה ראשונית</h4>
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
 <!--        <input type="file" name="image">-->
-    <input type="submit" value="OK">
+    <input type="submit" value="שלח">
     <div id="errors">
     {{ form.name.errors }}
     {{ form.non_field_errors}}
     </div>
     </form>
 
-    <h1><a href="{% url 'TaharaImageListView' %}">מראות שנשמרו</a></h1>
-    <ul>
-    {% for comment in object_list %}
-        <li>{{ comment.updated_at|date }} - {{ comment.comment }}</li>
-    {% empty %}
-        <li>No articles yet.</li>
-    {% endfor %}
-    </ul>
-
+    <h4>לפסיקה על מראות שכבר עלו לאתר לחץ: ל<a href="{% url 'TaharaImageListView' %}">מראות שנשמרו</a></h4>
+<!--    <ul>-->
+<!--    {% for comment in object_list %}-->
+<!--        <li>{{ comment.updated_at|date }} - {{ comment.comment }}</li>-->
+<!--    {% empty %}-->
+<!--        <li>No articles yet.</li>-->
+<!--    {% endfor %}-->
+<!--    </ul>-->
+</div>
 {% endblock %}
