@@ -447,6 +447,11 @@ def excel_parsing(request):  # based on - https://github.com/anuragrana/excel-fi
         else:
             rslt_df = df
 
+
+def error_403(request, exception=None):
+    data = {}
+    return render(request, 'main/403.html', data)
+
 #         # https: // stackoverflow.com / questions / 48622486 / how - to - display - a - pandas - dataframe -as-datatable
 #         # https: // stackoverflow.com / questions / 52644035 / how - to - show - a - pandas - dataframe - into - a - existing - flask - html - table
 #         return render(request, 'main/excel_parsing.html', {"tables": [rslt_df.to_html(classes='dataframe', header="true")], "select_elements": select_elements})

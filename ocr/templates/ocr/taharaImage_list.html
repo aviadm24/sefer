@@ -14,16 +14,16 @@
 <!--        <li>{{ object.first_pesak }}</li>-->
         <p>לחץ כדי לראות תמונה גדולה עם אפשרות להגדלה</p>
         <a href="{{ object.image.url }}" target="_blank" class="public_id_link">
-            צד א
+            תמונה עקרית
             <div class='public_id'>{{ object.image.public_id }} - {{ object.title }}</div>
             {% cloudinary object.image THUMBNAIL %}
           </a>
         <a href="{{ object.image2.url }}" target="_blank" class="public_id_link">
-            צד ב
+            תמונה משנית
             <div class='public_id'>{{ object.image2.public_id }} - {{ object.title }}</div>
             {% cloudinary object.image2 THUMBNAIL %}
           </a>
-        <p><a href="{% url 'TaharaImageUpdateView' object.id %}">לפסיקה דרך המסך</a></p>
+        <p><a href="{% url 'TaharaImageUpdateView' object.id %}">לחץ פה לפסיקה על התמונות</a></p>
 
         <hr/>
         <!-- If objet_list is empty  -->
