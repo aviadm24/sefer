@@ -54,17 +54,67 @@ def send_email(user):
 def image_to_color_percentage(image_file):
     img = Image.open(image_file)
     size = w, h = img.size
-    # pix_val = list(img.getdata())
-    # for pix in pix_val:
-    #     print(pix)
-    # data = img.load()
-    # colors = []
-    # for x in range(w):
-    #     for y in range(h):
-    #         color = data[x, y]
-    #         hex_color = '#' + ''.join([hex(c)[2:].rjust(2, '0') for c in color])
-    #         colors.append(hex_color)
-    return dict(size=size)  # , pix_val=pix_val
+    pixel_num = {
+        'redAVG': 0,
+        'dark<40': 0,
+        '240<red<255,green<40,blue<40': 0,
+        '240<red<255,green<100,blue<40': 0,
+        '240<red<255,green<150,blue<40': 0,
+        '220<red<240,green<40,blue<40': 0,
+        '220<red<240,green<100,blue<40': 0,
+        '220<red<240,green<150,blue<40': 0,
+        '200<red<220,green<40,blue<40': 0,
+        '200<red<220,green<100,blue<40': 0,
+        '200<red<220,green<150,blue<40': 0,
+    }
+    # https: // stackoverflow.com / questions / 47520048 / how - to - count - bright - pixels - in -an - image
+    # https://stackoverflow.com/questions/50545192/count-different-colour-pixels-python
+    for pixel in img.getdata():
+        r = pixel[0]
+        g = pixel[1]
+        b = pixel[2]
+        color = ''
+        brightness = ''
+        avg = (r + g + b) / 3
+        if r != 0:
+            if avg / r < 0.9:
+                pixel_num['redAVG'] += 1
+        if b < 40:
+            if g < 40:
+                if r < 40:
+                    pixel_num['dark<40'] += 1
+                elif 240 < r < 255:
+                    pixel_num['240<red<255,green<40,blue<40'] += 1
+                elif 220 < r < 240:
+                    pixel_num['220<red<240,green<40,blue<40'] += 1
+                elif 200 < r < 220:
+                    pixel_num['200<red<220,green<40,blue<40'] += 1
+            elif g < 100:
+                if 240 < r < 255:
+                    pixel_num['240<red<255,green<100,blue<40'] += 1
+                elif 220 < r < 240:
+                    pixel_num['220<red<240,green<100,blue<40'] += 1
+                elif 200 < r < 220:
+                    pixel_num['200<red<220,green<100,blue<40'] += 1
+            elif g < 150:
+                if 240 < r < 255:
+                    pixel_num['240<red<255,green<150,blue<40'] += 1
+                elif 220 < r < 240:
+                    pixel_num['220<red<240,green<150,blue<40'] += 1
+                elif 200 < r < 220:
+                    pixel_num['200<red<220,green<150,blue<40'] += 1
+        # else if avg < 80 then brightness = 'dark'
+        # else if avg > 220 then brightness = 'white'
+        # else if avg > 150 then brightness = 'light'
+        # if avg / r > 0.9 then hue = 'red'
+    pixel_avg = {}
+    pixel_total = w*h
+    for k, v in pixel_num.items():
+        if v > 0:
+            pixel_avg[k] = v/pixel_total
+        print('k: ', k, ' v: ', v)
+
+    return dict(size=size, pixel_num=pixel_num, pixel_avg=pixel_avg)  # , pix_val=pix_val
 
 
 # @login_required(redirect_field_name='account_login')
