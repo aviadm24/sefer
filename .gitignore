@@ -4,7 +4,6 @@ db.sqlite3
 *.pyc
 .idea
 venv/
-migrations/
 sendgrid.env
 mailgun.txt
 secret_key.txt
