@@ -28,6 +28,7 @@ def send_email(user):
     # )
 
 
+# https://devcenter.heroku.com/articles/scheduling-custom-django-management-commands
 class Command(BaseCommand):
     help = 'sends email to all users if 7 days passed'
 
