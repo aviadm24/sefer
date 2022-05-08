@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, m2m_changed, pre_save
 from cloudinary.models import CloudinaryField
 from PIL import Image
 from collections import Counter
@@ -81,7 +81,7 @@ class TaharaImage(models.Model):
     place_holder = models.CharField(max_length=1000, blank=True, null=True, default='')
     # https: // stackoverflow.com / questions / 42570194 / im - trying - to - display - the - percentage - of - red - color - in -my - image -
     # with-opencv - and -py
-    color_percentage = models.JSONField(default=dict())
+    color_percentage = models.JSONField(default=dict(), blank=True)  # , blank=True
 
     def __unicode__(self):
         try:
@@ -100,28 +100,79 @@ class TaharaImage(models.Model):
     #             return a[1]
     #  https://bhch.github.io/posts/2018/12/django-how-to-editmanipulate-uploaded-images-on-the-fly-before-saving/
 
-    def save(self, *args, **kwargs):
-        # image1 = image_to_color_percentage(self.image)
-        # image2 = image_to_color_percentage(self.image2)
-        # self.color_percentage = dict(image1=image1, image2=image2)
-        # print("image size: ", self.color_percentage)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     image1 = image_to_color_percentage(self.image)
+    #     image2 = image_to_color_percentage(self.image2)
+    #     self.color_percentage = dict(image1=image1, image2=image2)
+    #     print("image size: ", self.color_percentage)
+    #     super().save(*args, **kwargs)
 
 
 def image_to_color_percentage(image_file):
     img = Image.open(image_file)
     size = w, h = img.size
-    # pix_val = list(img.getdata())
-    # for pix in pix_val:
-    #     print(pix)
-    # data = img.load()
-    # colors = []
-    # for x in range(w):
-    #     for y in range(h):
-    #         color = data[x, y]
-    #         hex_color = '#' + ''.join([hex(c)[2:].rjust(2, '0') for c in color])
-    #         colors.append(hex_color)
-    return dict(size=size)  # , pix_val=pix_val
+    pixel_num = {
+        'redAVG': 0,
+        'dark<40': 0,
+        '240<red<255,green<40,blue<40': 0,
+        '240<red<255,green<100,blue<40': 0,
+        '240<red<255,green<150,blue<40': 0,
+        '220<red<240,green<40,blue<40': 0,
+        '220<red<240,green<100,blue<40': 0,
+        '220<red<240,green<150,blue<40': 0,
+        '200<red<220,green<40,blue<40': 0,
+        '200<red<220,green<100,blue<40': 0,
+        '200<red<220,green<150,blue<40': 0,
+    }
+    # https: // stackoverflow.com / questions / 47520048 / how - to - count - bright - pixels - in -an - image
+    # https://stackoverflow.com/questions/50545192/count-different-colour-pixels-python
+    for pixel in img.getdata():
+        r = pixel[0]
+        g = pixel[1]
+        b = pixel[2]
+        color = ''
+        brightness = ''
+        avg = (r + g + b) / 3
+        if r != 0:
+            if avg / r < 0.9:
+                pixel_num['redAVG'] += 1
+        if b < 40:
+            if g < 40:
+                if r < 40:
+                    pixel_num['dark<40'] += 1
+                elif 240 < r < 255:
+                    pixel_num['240<red<255,green<40,blue<40'] += 1
+                elif 220 < r < 240:
+                    pixel_num['220<red<240,green<40,blue<40'] += 1
+                elif 200 < r < 220:
+                    pixel_num['200<red<220,green<40,blue<40'] += 1
+            elif g < 100:
+                if 240 < r < 255:
+                    pixel_num['240<red<255,green<100,blue<40'] += 1
+                elif 220 < r < 240:
+                    pixel_num['220<red<240,green<100,blue<40'] += 1
+                elif 200 < r < 220:
+                    pixel_num['200<red<220,green<100,blue<40'] += 1
+            elif g < 150:
+                if 240 < r < 255:
+                    pixel_num['240<red<255,green<150,blue<40'] += 1
+                elif 220 < r < 240:
+                    pixel_num['220<red<240,green<150,blue<40'] += 1
+                elif 200 < r < 220:
+                    pixel_num['200<red<220,green<150,blue<40'] += 1
+        # else if avg < 80 then brightness = 'dark'
+        # else if avg > 220 then brightness = 'white'
+        # else if avg > 150 then brightness = 'light'
+        # if avg / r > 0.9 then hue = 'red'
+    pixel_avg = {}
+    pixel_total = w*h
+    for k, v in pixel_num.items():
+        if v > 0:
+            pixel_avg[k] = v/pixel_total
+        print('k: ', k, ' v: ', v)
+
+    return dict(size=size, pixel_num=pixel_num, pixel_avg=pixel_avg)  # , pix_val=pix_val
+
 
 # https://stackoverflow.com/questions/44489375/django-have-admin-take-image-file-but-store-it-as-a-base64-string
 # @receiver(post_save, sender=TaharaImage)
@@ -135,3 +186,11 @@ def image_to_color_percentage(image_file):
 #             instance.color_percentage = dict(image1=image1, image2=image2)
 #             # instance.logo_image.delete()
 #             instance.save()
+
+
+@receiver(pre_save, sender=TaharaImage)
+def my_callback(sender, instance, *args, **kwargs):
+    image1 = image_to_color_percentage(instance.image)
+    image2 = image_to_color_percentage(instance.image2)
+    instance.color_percentage = dict(image1=image1, image2=image2)
+    print("image size: ", instance.color_percentage)
