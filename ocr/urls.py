@@ -25,4 +25,5 @@ urlpatterns = [
     # path('list_image/', views.cloudinary_list, name='TaharaImageListView'),
     path('update_image/<slug:pk>/', views.TaharaImageUpdateView.as_view(), name='TaharaImageUpdateView'),
     path('incoming_sms/', views.incoming_sms, name='incoming_sms'),
+    path('send_email/', views.send_email, name='send_email'),
 ]

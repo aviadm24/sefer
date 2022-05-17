@@ -204,6 +204,19 @@ class TaharaImageUpdateView(PermissionRequiredMixin, UpdateView):
     success_url = '/ocr/list_image'
 
 
+def send_email(request):
+    subject = "מחקר מראות מכון פועה"
+    from_email, to = None, "aviadm24@gmail.com"
+    text_content = 'Text'
+    html_content = render_to_string(
+        'ocr/email.html')
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+    print('sending mail')
+    return render(request, template_name='ocr/email.html')
+
+
 def home(request):
     return render(request, template_name='ocr/home.html')
 

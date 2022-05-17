@@ -6,9 +6,6 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 
-
-
-
 def send_email(user):
     subject = "מחקר מראות מכון פועה"
     from_email, to = "email@www.torracomments.com", user.email

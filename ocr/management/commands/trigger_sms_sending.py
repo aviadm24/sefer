@@ -39,31 +39,31 @@ class Command(BaseCommand):
 
     # https://stackoverflow.com/questions/41401202/django-command-throws-typeerror-handle-got-an-unexpected-keyword-argument
     def handle(self, *args, **options):
-        try:
-            for user in User.objects.all():
-                print('user name: ', user.email)
-                try:
-                    MIN_WAITING_TIME = WaitTime.objects.all().first()
-                except:
-                    MIN_WAITING_TIME = 1
+        # try:
+        for user in User.objects.all():
+            print('user name: ', user.email)
+            try:
+                MIN_WAITING_TIME = WaitTime.objects.all().first()
+            except:
+                MIN_WAITING_TIME = 1
 
-                qs = TaharaImage.objects.filter(rabbi_name=user). \
-                    filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(
-                    second_pesak__exact=None)
-                # print('yesterdy: ', timezone.now() - timedelta(days=1))
-                print('qs.count() : ', qs.count())
-                for image in qs:
-                    print(image.image.url)
-                    print(image.image2.url)
-                print("phone: ", user.first_name)
-                self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
-                if qs.count() > 0 and user.first_name:
-                    send_sms(qs[0].image2.url, user.first_name)
+            qs = TaharaImage.objects.filter(rabbi_name=user). \
+                filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(
+                second_pesak__exact=None)
+            # print('yesterdy: ', timezone.now() - timedelta(days=1))
+            print('qs.count() : ', qs.count())
+            for image in qs:
+                print(image.image.url)
+                print(image.image2.url)
+            print("phone: ", user.first_name)
+            self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
+            if qs.count() > 0 and user.first_name:
+                send_sms(qs[0].image2.url, user.first_name)
 
-            self.stdout.write(self.style.SUCCESS('sent sms'))
-        except:
-            self.stdout.write(self.style.ERROR('an exception has acourred'))
-            return
+        self.stdout.write(self.style.SUCCESS('sent sms'))
+        # except:
+        #     self.stdout.write(self.style.ERROR('an exception has acourred'))
+        #     return
 
         self.stdout.write(self.style.SUCCESS('Successfully sent sms'))
         return

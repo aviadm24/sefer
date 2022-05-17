@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TaharaImage, Answers, Light, CameraDevice, CameraConfig, Comment
+from .models import TaharaImage, Answers, Light, CameraDevice, CameraConfig, Comment, WaitTime
 import base64
 from django.utils.html import format_html
 
@@ -29,3 +29,4 @@ admin.site.register(Light)
 admin.site.register(CameraDevice)
 admin.site.register(CameraConfig)
 admin.site.register(Comment)
+admin.site.register(WaitTime)
