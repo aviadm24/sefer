@@ -47,6 +47,14 @@ class Comment(models.Model):
         return self.choice
 
 
+class WaitTime(models.Model):
+    days = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.days
+
+
+
 class TaharaImage(models.Model):
     # ANSWERS = (
     #     ('good', 'טהור'),
@@ -100,6 +108,10 @@ class TaharaImage(models.Model):
     #             return a[1]
     #  https://bhch.github.io/posts/2018/12/django-how-to-editmanipulate-uploaded-images-on-the-fly-before-saving/
 
+    def save(self, *args, **kwargs):
+        if self.light is None:  # Set default reference
+            self.light = Light.objects.get(id=1)
+        super(TaharaImage, self).save(*args, **kwargs)
     # def save(self, *args, **kwargs):
     #     image1 = image_to_color_percentage(self.image)
     #     image2 = image_to_color_percentage(self.image2)
@@ -193,4 +205,9 @@ def my_callback(sender, instance, *args, **kwargs):
     image1 = image_to_color_percentage(instance.image)
     image2 = image_to_color_percentage(instance.image2)
     instance.color_percentage = dict(image1=image1, image2=image2)
+    # if instance.image2:
+    #     image2 = image_to_color_percentage(instance.image2)
+    #     instance.color_percentage = dict(image1=image1, image2=image2)
+    # else:
+    #     instance.color_percentage = dict(image1=image1)
     print("image size: ", instance.color_percentage)

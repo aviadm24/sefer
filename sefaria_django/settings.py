@@ -121,7 +121,7 @@ if EMAIL_HOST == '':
         EMAIL_HOST_PASSWORD = creds[3].strip()
     except FileNotFoundError:
         print("no mailgun.txt file found!")
-DEFAULT_FROM_EMAIL = 'toracomments@gmail.com'
+DEFAULT_FROM_EMAIL = "email@www.torracomments.com"  # 'toracomments@gmail.com'
 # print("EMAIL_HOST: ", EMAIL_HOST)
 LOGIN_REDIRECT_URL = "/"
 # LOGIN_REQUIRED_IGNORE_PATHS = [

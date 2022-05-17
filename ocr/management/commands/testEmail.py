@@ -6,9 +6,6 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 
-
-
-
 def send_email(user):
     subject = "מחקר מראות מכון פועה"
     from_email, to = "email@www.torracomments.com", user.email
@@ -19,13 +16,6 @@ def send_email(user):
     msg.attach_alternative(html_content, "text/html")
     msg.send(fail_silently=False)
     print('sending mail')
-    # send_mail(
-    #     'מחקר מראות מכון פועה',
-    #     'Here is the message.',
-    #     'from@example.com',
-    #     [user.email],
-    #     fail_silently=False,
-    # )
 
 
 # https://devcenter.heroku.com/articles/scheduling-custom-django-management-commands
@@ -36,22 +26,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # try:
         for user in User.objects.all():
-            print('user name: ', user.email)
-            try:
-                MIN_WAITING_TIME = WaitTime.objects.all().first()
-            except:
-                MIN_WAITING_TIME = 1
-            self.stdout.write(self.style.SUCCESS(f'user email: {user.email}'))
-            qs = TaharaImage.objects.filter(rabbi_name=user). \
-                filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(
-                second_pesak__exact=None)
-            # print('yesterdy: ', timezone.now() - timedelta(days=1))
-            # print('last login: ', user.last_login)
-            print('qs.count() : ', qs.count())
-            self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
-            if qs.count() > 0:
+            if user.email in ['aviadm24@gmail.com', 'ys@puah.org.il']:
                 send_email(user)
-
         self.stdout.write(self.style.SUCCESS('sent email'))
         # except:
         #     self.stdout.write(self.style.ERROR('an exception has acourred'))

@@ -30,7 +30,7 @@ import smtplib, ssl
 message = """\
 Subject: Test from Python
 To: aviadm24@gmail.com
-From: aviadm24@gmail.com
+From: email@www.torracomments.com
 
 This message is sent from Python."""
 
@@ -38,6 +38,6 @@ server = smtplib.SMTP(hostname, 587)
 server.ehlo() # Can be omitted
 server.starttls(context=ssl.create_default_context()) # Secure the connection
 server.login(username, password)
-ans = server.sendmail("aviadm24@gmail.com", "aviadm24@gmail.com", message)
+ans = server.sendmail("email@www.torracomments.com", "aviadm24@gmail.com", message)
 print(ans)
 server.quit

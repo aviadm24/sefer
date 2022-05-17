@@ -28,6 +28,8 @@ from cloudinary.forms import cl_init_js_callbacks
 import six
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
+import urllib.parse as pr
+
 
 MIN_WAITING_TIME = 1
 
@@ -204,6 +206,32 @@ class TaharaImageUpdateView(PermissionRequiredMixin, UpdateView):
 
 def home(request):
     return render(request, template_name='ocr/home.html')
+
+#  https://developers.clicksend.com/docs/rest/v3/#view-inbound-sms
+@csrf_exempt
+def incoming_sms(request):
+    if request.method == "POST":
+        # parse body and get SMS data (id, status)
+        post_body_uft8 = request.body.decode("utf-8")
+        data = dict(pr.parse_qsl(post_body_uft8))
+        print("*** Testing new API ***")
+        print(post_body_uft8)
+        print(data)
+        print("*** End Test ***")
+        return HttpResponse("")
+        # project_id, status = get_project_id_and_message(data)
+        # update status in spreadsheet or exit if there"s a problem
+        # if id and status in ["טופל", "ממתין", "נוצר קשר", "וידוא משימה"]:
+            # print("Incoming SMS with ID: {}, Status: {}".format(project_id, status))
+            # update_spreadsheet(id=project_id, status=status)
+        # else:
+            # print("Invalid SMS")
+            # return HttpResponse("")
+
+        # if task was completed - cancel an SMS reminder (if exists)
+        # if status == "טופל":
+            # cancel_sms_by_project_id(project_id)
+        # return HttpResponse("")
 
 
 @csrf_exempt

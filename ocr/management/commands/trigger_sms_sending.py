@@ -1,32 +1,72 @@
-from __future__ import print_function
+from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.models import User
+from ocr.models import TaharaImage, WaitTime
+from datetime import timedelta, datetime
 import time
 import os
 import clicksend_client
-from clicksend_client import SmsMessage
+from clicksend_client import SmsMessage, MmsMessage
 from clicksend_client.rest import ApiException
 from pprint import pprint
 import ast
+MIN_WAITING_TIME = 1
 # Configure HTTP basic authorization: BasicAuth
 configuration = clicksend_client.Configuration()
 configuration.username = os.environ.get('CLICKSEND_USERNAME', '')
 configuration.password = os.environ.get('CLICKSEND_PASSWORD', '')
-
 # create an instance of the API class
 # api_instance = clicksend_client.AccountApi(clicksend_client.ApiClient(configuration))
 api_instance = clicksend_client.SMSApi(clicksend_client.ApiClient(configuration))
-# If you want to explictly set from, add the key _from to the message.
-sms_message = SmsMessage(source="toracomments",
-                        body="test",
-                        to="+972{}".format("547573120"))
 
-sms_messages = clicksend_client.SmsMessageCollection(messages=[sms_message])
 
-try:
-    # Send sms message(s)
-    api_response = api_instance.sms_send_post(sms_messages)
-    print(api_response)
-except ApiException as e:
-    print("Exception when calling SMSApi->sms_send_post: %s\n" % e)
+def send_sms(image_url, rabbi_phone_num):
+    sms_message = SmsMessage(source="toracomments",
+                             body="{} \n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n5 פצע".format(image_url),
+                             to="+972{}".format(rabbi_phone_num))
+
+    sms_messages = clicksend_client.SmsMessageCollection(messages=[sms_message])
+    try:
+        # Send sms message(s)
+        api_response = api_instance.sms_send_post(sms_messages)
+        print(api_response)
+    except ApiException as e:
+        print("Exception when calling SMSApi->sms_send_post: %s\n" % e)
+
+
+# https://devcenter.heroku.com/articles/scheduling-custom-django-management-commands
+class Command(BaseCommand):
+    help = 'sends sms to all users if days passed'
+
+    # https://stackoverflow.com/questions/41401202/django-command-throws-typeerror-handle-got-an-unexpected-keyword-argument
+    def handle(self, *args, **options):
+        try:
+            for user in User.objects.all():
+                print('user name: ', user.email)
+                try:
+                    MIN_WAITING_TIME = WaitTime.objects.all().first()
+                except:
+                    MIN_WAITING_TIME = 1
+
+                qs = TaharaImage.objects.filter(rabbi_name=user). \
+                    filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(
+                    second_pesak__exact=None)
+                # print('yesterdy: ', timezone.now() - timedelta(days=1))
+                print('qs.count() : ', qs.count())
+                for image in qs:
+                    print(image.image.url)
+                    print(image.image2.url)
+                print("phone: ", user.first_name)
+                self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
+                if qs.count() > 0 and user.first_name:
+                    send_sms(qs[0].image2.url, user.first_name)
+
+            self.stdout.write(self.style.SUCCESS('sent sms'))
+        except:
+            self.stdout.write(self.style.ERROR('an exception has acourred'))
+            return
+
+        self.stdout.write(self.style.SUCCESS('Successfully sent sms'))
+        return
 # try:
 #     # Get account information
 #     api_response = api_instance.account_get()

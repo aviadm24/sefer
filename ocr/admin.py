@@ -4,12 +4,23 @@ import base64
 from django.utils.html import format_html
 
 
-class TaharaImageAdmin(admin.ModelAdmin):
-    readonly_fields = ["image_logo", ]
+# def null_filter(field, title_=None):
+#     class NullListFieldFilter(NullListFilter):
+#         parameter_name = field
+#         title = title_ or parameter_name
+#     return NullListFieldFilter
 
-    def image_logo(self, obj):
-        # print("utf: ", str(obj.logo)[2:-1])
-        return format_html('<img src="data:image/png;base64,{}">', str(obj.logo)[2:-1])
+
+class TaharaImageAdmin(admin.ModelAdmin):
+    list_filter = (
+        ("second_pesak", admin.EmptyFieldListFilter),
+    )
+
+    # readonly_fields = ["image_logo", ]
+    #
+    # def image_logo(self, obj):
+    #     # print("utf: ", str(obj.logo)[2:-1])
+    #     return format_html('<img src="data:image/png;base64,{}">', str(obj.logo)[2:-1])
 
 
 admin.site.register(TaharaImage, TaharaImageAdmin)
