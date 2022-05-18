@@ -22,7 +22,7 @@ def send_mail(user):
         print(response.body)
         print(response.headers)
     except Exception as e:
-        print(e.message)
+        print(e)
 
 # def send_email(user):
 #     subject = "מחקר מראות מכון פועה"

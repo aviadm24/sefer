@@ -214,14 +214,19 @@ class TaharaImageUpdateView(PermissionRequiredMixin, UpdateView):
 
 
 def send_email(request):
-    subject = "מחקר מראות מכון פועה"
-    from_email, to = None, "aviadm24@gmail.com"
-    text_content = 'Text'
-    html_content = render_to_string(
-        'ocr/email.html')
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+    message = Mail(
+        from_email='aviadm24@gmail.com',
+        to_emails='aviadm24@gmail.com',
+        subject="מחקר מראות מכון פועה",
+        html_content=render_to_string('ocr/email.html'))
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e)
     print('sending mail')
     return render(request, template_name='ocr/email.html')
 
