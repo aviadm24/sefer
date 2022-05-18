@@ -19,9 +19,10 @@ configuration.password = os.environ.get('CLICKSEND_PASSWORD', '')
 api_instance = clicksend_client.SMSApi(clicksend_client.ApiClient(configuration))
 
 
-def send_sms(image_url, rabbi_phone_num):
+def send_sms(image_url, image_id, rabbi_phone_num):
     sms_message = SmsMessage(source="toracomments",
-                             body="{} \n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n5 פצע".format(image_url),
+                             body="{}\nimage_id#{}\n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n5 פצע".
+                             format(image_url, image_id),
                              to="+972{}".format(rabbi_phone_num))
 
     sms_messages = clicksend_client.SmsMessageCollection(messages=[sms_message])
@@ -59,7 +60,7 @@ class Command(BaseCommand):
             print("phone: ", user.first_name)
             self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
             if qs.count() > 0 and user.first_name:
-                send_sms(qs[0].image2.url, user.first_name)
+                send_sms(qs[0].image2.url, qs[0].id, user.first_name)
 
         self.stdout.write(self.style.SUCCESS('sent sms'))
         # except:

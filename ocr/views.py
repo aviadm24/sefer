@@ -13,7 +13,7 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from datetime import timedelta, datetime
 from django.views.generic import TemplateView, CreateView
-from .models import TaharaImage
+from .models import TaharaImage, Answers
 from django.contrib.auth.models import User
 from .forms import TaharaImageForm
 from django.utils import timezone
@@ -29,28 +29,37 @@ import six
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 import urllib.parse as pr
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
+def send_mail(user):
+    message = Mail(
+        from_email='email@toracomments.com',
+        to_emails=user.email,
+        subject="מחקר מראות מכון פועה",
+        html_content=render_to_string('ocr/email.html') )
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
 
 MIN_WAITING_TIME = 1
 
 
-def send_email(user):
-    subject = "מחקר מראות מכון פועה"
-    from_email, to = None, user.email
-    text_content = 'Text'
-    html_content = render_to_string(
-        'ocr/email.html')
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-    print('sending mail')
-    # send_mail(
-    #     'מחקר מראות מכון פועה',
-    #     'Here is the message.',
-    #     'from@example.com',
-    #     [user.email],
-    #     fail_silently=False,
-    # )
+# def send_email(user):
+#     subject = "מחקר מראות מכון פועה"
+#     from_email, to = None, user.email
+#     text_content = 'Text'
+#     html_content = render_to_string(
+#         'ocr/email.html')
+#     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+#     msg.attach_alternative(html_content, "text/html")
+#     msg.send()
+#     print('sending mail')
 
 
 def image_to_color_percentage(image_file):
@@ -220,6 +229,14 @@ def send_email(request):
 def home(request):
     return render(request, template_name='ocr/home.html')
 
+def get_image_id(data):
+    parsed_message = pr.unquote(data["originalmessage"])
+    answer = pr.unquote(data["message"]).strip()
+    split_message = parsed_message.split('\n')
+    image_id = split_message[1].split('#')[1].strip()
+    # status = split_message[1].strip()
+    return image_id, answer if image_id.isdigit() and answer.isdigit() else None, None
+
 #  https://developers.clicksend.com/docs/rest/v3/#view-inbound-sms
 @csrf_exempt
 def incoming_sms(request):
@@ -228,23 +245,20 @@ def incoming_sms(request):
         post_body_uft8 = request.body.decode("utf-8")
         data = dict(pr.parse_qsl(post_body_uft8))
         print("*** Testing new API ***")
-        print(post_body_uft8)
+        # print(post_body_uft8)
         print(data)
         print("*** End Test ***")
-        return HttpResponse("")
-        # project_id, status = get_project_id_and_message(data)
-        # update status in spreadsheet or exit if there"s a problem
-        # if id and status in ["טופל", "ממתין", "נוצר קשר", "וידוא משימה"]:
-            # print("Incoming SMS with ID: {}, Status: {}".format(project_id, status))
-            # update_spreadsheet(id=project_id, status=status)
-        # else:
-            # print("Invalid SMS")
-            # return HttpResponse("")
+        image_id, answer = get_image_id(data)
+        if image_id and answer in ["1", "2", "3", "4", "5"]:
+            print("Incoming SMS with ID: {}, answer: {}".format(image_id, answer))
+            answers_choice = Answers.objects.get(pk=int(answer))
+            TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice)
+            print("update success")
+        else:
+            print("Invalid SMS")
+            return HttpResponse("")
 
-        # if task was completed - cancel an SMS reminder (if exists)
-        # if status == "טופל":
-            # cancel_sms_by_project_id(project_id)
-        # return HttpResponse("")
+        return HttpResponse("")
 
 
 @csrf_exempt

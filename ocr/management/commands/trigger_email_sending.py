@@ -4,25 +4,35 @@ from ocr.models import TaharaImage, WaitTime
 from datetime import timedelta, datetime
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+import os
 
+def send_mail(user):
+    message = Mail(
+        from_email='email@toracomments.com',
+        to_emails=user.email,
+        subject="מחקר מראות מכון פועה",
+        html_content=render_to_string('ocr/email.html') )
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
 
-def send_email(user):
-    subject = "מחקר מראות מכון פועה"
-    from_email, to = "email@www.torracomments.com", user.email
-    text_content = 'Text'
-    html_content = render_to_string(
-        'ocr/email.html')
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send(fail_silently=False)
-    print('sending mail')
-    # send_mail(
-    #     'מחקר מראות מכון פועה',
-    #     'Here is the message.',
-    #     'from@example.com',
-    #     [user.email],
-    #     fail_silently=False,
-    # )
+# def send_email(user):
+#     subject = "מחקר מראות מכון פועה"
+#     from_email, to = "email@www.torracomments.com", user.email
+#     text_content = 'Text'
+#     html_content = render_to_string(
+#         'ocr/email.html')
+#     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+#     msg.attach_alternative(html_content, "text/html")
+#     msg.send(fail_silently=False)
+#     print('sending mail')
 
 
 # https://devcenter.heroku.com/articles/scheduling-custom-django-management-commands
@@ -35,7 +45,7 @@ class Command(BaseCommand):
         for user in User.objects.all():
             print('user name: ', user.email)
             try:
-                MIN_WAITING_TIME = WaitTime.objects.all().first()
+                MIN_WAITING_TIME = WaitTime.objects.all().first().days
             except:
                 MIN_WAITING_TIME = 1
             self.stdout.write(self.style.SUCCESS(f'user email: {user.email}'))
