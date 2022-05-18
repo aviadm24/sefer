@@ -43,7 +43,8 @@ class Command(BaseCommand):
         for user in User.objects.all():
             print('user name: ', user.email)
             try:
-                MIN_WAITING_TIME = WaitTime.objects.all().first()
+                MIN_WAITING_TIME = WaitTime.objects.all().first().days
+                print('MIN_WAITING_TIME: ', MIN_WAITING_TIME)
             except:
                 MIN_WAITING_TIME = 1
 
