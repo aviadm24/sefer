@@ -51,8 +51,7 @@ class WaitTime(models.Model):
     days = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.days
-
+        return str(self.days)
 
 
 class TaharaImage(models.Model):

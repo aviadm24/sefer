@@ -152,7 +152,7 @@ def TaharaImageCreateView(request):
             if qs.count() > 0:
                 if user.last_login:
                     if user.last_login < timezone.now()-timedelta(days=1):
-                        send_email(user)
+                        # send_email(user)
                         user.last_login = timezone.now()
                         user.save(update_fields=['last_login'])
                 else:
