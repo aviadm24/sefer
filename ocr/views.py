@@ -229,13 +229,20 @@ def send_email(request):
 def home(request):
     return render(request, template_name='ocr/home.html')
 
+
 def get_image_id(data):
     parsed_message = pr.unquote(data["originalmessage"])
+    print("parsed_message: ", parsed_message)
     answer = pr.unquote(data["message"]).strip()
+    print("answer: ", answer)
+    if not answer.isdigit():
+        answer = None
     split_message = parsed_message.split('\n')
     image_id = split_message[1].split('#')[1].strip()
-    # status = split_message[1].strip()
-    return image_id, answer if image_id.isdigit() and answer.isdigit() else None, None
+    if not image_id.isdigit():
+        image_id = None
+
+    return image_id, answer
 
 #  https://developers.clicksend.com/docs/rest/v3/#view-inbound-sms
 @csrf_exempt
