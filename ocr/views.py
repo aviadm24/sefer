@@ -34,7 +34,7 @@ from sendgrid.helpers.mail import Mail
 
 def send_mail(user):
     message = Mail(
-        from_email='email@toracomments.com',
+        from_email='aviadm24@gmail.com',
         to_emails=user.email,
         subject="מחקר מראות מכון פועה",
         html_content=render_to_string('ocr/email.html') )
@@ -140,8 +140,8 @@ def TaharaImageCreateView(request):
             tahara_image = form.save(commit=False)
             # tahara_image.rabbi_name = request.user
             image1 = image_to_color_percentage(tahara_image.image)
-            image2 = image_to_color_percentage(tahara_image.image2)
-            tahara_image.color_percentage = dict(image1=image1, image2=image2)
+            # image2 = image_to_color_percentage(tahara_image.image2)
+            tahara_image.color_percentage = dict(image1=image1) #, image2=image2)
             print("image size: ", tahara_image.color_percentage)
             tahara_image.save()
             return render(request, 'ocr/taharaImage_list.html')

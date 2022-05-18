@@ -12,14 +12,14 @@ class TaharaImageForm(ModelForm):
     class Meta:
         model = TaharaImage
         exclude = ['release_date', 'logo', 'showed_to', 'second_pesak', 'user_agent', 'place_holder',
-                   'color_percentage']
+                   'color_percentage', 'image2']
         labels = {
             "rabbi_name": "שם הרב",
             "first_pesak": "פסק",
             "logo_image": "העלה תמונה",
             "second_pesak": "פסק",
             "image": "צד עיקרי",
-            "image2": "צד שני",
+            #"image2": "צד שני",
         }
 
 

@@ -11,7 +11,7 @@ from sendgrid.helpers.mail import Mail
 
 def send_email(user):
     message = Mail(
-        from_email='from_email@example.com',
+        from_email='aviadm24@gmail.com',
         to_emails='aviadm24@gmail.com',
         subject='Sending with Twilio SendGrid is Fun',
         html_content='<strong>and easy to do anywhere, even with Python</strong>')

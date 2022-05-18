@@ -8,9 +8,10 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import os
 
+
 def send_mail(user):
     message = Mail(
-        from_email='email@toracomments.com',
+        from_email='aviadm24@gmail.com',
         to_emails=user.email,
         subject="מחקר מראות מכון פועה",
         html_content=render_to_string('ocr/email.html') )
