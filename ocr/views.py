@@ -32,12 +32,13 @@ import urllib.parse as pr
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+
 def send_mail(user):
     message = Mail(
-        from_email='aviadm24@gmail.com',
+        from_email='aviadm32@gmail.com',
         to_emails=user.email,
         subject="מחקר מראות מכון פועה",
-        html_content=render_to_string('ocr/email.html') )
+        html_content=render_to_string('ocr/email.html'))
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
@@ -215,7 +216,7 @@ class TaharaImageUpdateView(PermissionRequiredMixin, UpdateView):
 
 def send_email(request):
     message = Mail(
-        from_email='aviadm24@gmail.com',
+        from_email='aviadm32@gmail.com',
         to_emails='aviadm24@gmail.com',
         subject="מחקר מראות מכון פועה",
         html_content=render_to_string('ocr/email.html'))

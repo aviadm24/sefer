@@ -11,7 +11,7 @@ import os
 
 def send_mail(user):
     message = Mail(
-        from_email='aviadm24@gmail.com',
+        from_email='aviadm32@gmail.com',
         to_emails=user.email,
         subject="מחקר מראות מכון פועה",
         html_content=render_to_string('ocr/email.html') )

@@ -109,7 +109,9 @@ class TaharaImage(models.Model):
 
     def save(self, *args, **kwargs):
         if self.light is None:  # Set default reference
-            self.light = Light.objects.get(id=1)
+            self.light = Light.objects.get(id=3)
+        if self.user_agent is None:  # Set default reference
+            self.user_agent = self.rabbi_name.last_name
         super(TaharaImage, self).save(*args, **kwargs)
     # def save(self, *args, **kwargs):
     #     image1 = image_to_color_percentage(self.image)
