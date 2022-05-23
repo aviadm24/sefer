@@ -34,11 +34,14 @@ from sendgrid.helpers.mail import Mail
 
 
 def send_mail(user):
+    context = {
+        'image_url': "image_url",
+    }
     message = Mail(
         from_email='aviadm32@gmail.com',
         to_emails=user.email,
         subject="מחקר מראות מכון פועה",
-        html_content=render_to_string('ocr/email.html'))
+        html_content=render_to_string('ocr/email.html', context))
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
