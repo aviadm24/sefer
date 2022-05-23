@@ -5,16 +5,31 @@ from datetime import timedelta, datetime
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import Mail, Attachment
 import os
 
 
-def send_mail(user):
+def send_mail(user, image_url):
+    context = {
+        'image_url': image_url,
+    }
     message = Mail(
         from_email='aviadm32@gmail.com',
         to_emails=user.email,
         subject="מחקר מראות מכון פועה",
-        html_content=render_to_string('ocr/email.html') )
+        html_content=render_to_string('ocr/email.html', context))
+    # with open('attachment.pdf', 'rb') as f:
+    #     data = f.read()
+    #     f.close()
+    # encoded_file = base64.b64encode(data).decode()
+    #
+    # attachedFile = Attachment(
+    #     FileContent(encoded_file),
+    #     FileName('attachment.pdf'),
+    #     FileType('application/pdf'),
+    #     Disposition('attachment')
+    # )
+    # message.attachment = attachedFile
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
@@ -58,7 +73,7 @@ class Command(BaseCommand):
             print('qs.count() : ', qs.count())
             self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
             if qs.count() > 0:
-                send_email(user)
+                send_mail(user, qs[0].image.url)
 
         self.stdout.write(self.style.SUCCESS('sent email'))
         # except:
