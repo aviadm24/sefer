@@ -127,7 +127,7 @@ def image_to_color_percentage(image_file):
     for k, v in pixel_num.items():
         if v > 0:
             pixel_avg[k] = v/pixel_total
-        print('k: ', k, ' v: ', v)
+        # print('k: ', k, ' v: ', v)
 
     return dict(size=size, pixel_num=pixel_num, pixel_avg=pixel_avg)  # , pix_val=pix_val
 
@@ -137,16 +137,11 @@ def image_to_color_percentage(image_file):
 def TaharaImageCreateView(request):
     # print("method: ", request.method)
     if request.method == 'POST':
-        # print("request.POST: ", request.POST)
-        # print("request.FILES: ", request.FILES)
         form = TaharaImageForm(request.POST, request.FILES)
         if form.is_valid():
             tahara_image = form.save(commit=False)
-            # tahara_image.rabbi_name = request.user
-            image1 = image_to_color_percentage(tahara_image.image)
-            # image2 = image_to_color_percentage(tahara_image.image2)
-            tahara_image.color_percentage = dict(image1=image1) #, image2=image2)
-            print("image size: ", tahara_image.color_percentage)
+            # image1 = image_to_color_percentage(tahara_image.image)
+            # tahara_image.color_percentage = dict(image1=image1)
             tahara_image.save()
             return render(request, 'ocr/taharaImage_list.html')
             # return redirect('TaharaImageListView')

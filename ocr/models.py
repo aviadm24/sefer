@@ -201,16 +201,16 @@ def image_to_color_percentage(image_file):
 #             instance.save()
 
 
-@receiver(pre_save, sender=TaharaImage)
-def my_callback(sender, instance, *args, **kwargs):
-    try:
-        print(instance.image)
-        if type(instance.image) == "<class 'cloudinary.CloudinaryResource'>":
-            pass
-        else:
-            image1 = image_to_color_percentage(instance.image)
-            # image2 = image_to_color_percentage(instance.image2)
-            instance.color_percentage = dict(image1=image1) #, image2=image2)
-        print("image size: ", instance.color_percentage)
-    except AttributeError as e:
-        print(e)
+# @receiver(pre_save, sender=TaharaImage)
+# def my_callback(sender, instance, *args, **kwargs):
+#     try:
+#         print(instance.image)
+#         if type(instance.image) == "<class 'cloudinary.CloudinaryResource'>":
+#             pass
+#         else:
+#             image1 = image_to_color_percentage(instance.image)
+#             # image2 = image_to_color_percentage(instance.image2)
+#             instance.color_percentage = dict(image1=image1) #, image2=image2)
+#         print("image size: ", instance.color_percentage)
+#     except AttributeError as e:
+#         print(e)
