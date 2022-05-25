@@ -9,9 +9,10 @@ from sendgrid.helpers.mail import Mail, Attachment
 import os
 
 
-def send_mail(user, image_url):
+def send_mail(user, image_url, image_id):
     context = {
         'image_url': image_url,
+        'image_id': image_id
     }
     message = Mail(
         from_email='aviadm32@gmail.com',
@@ -73,7 +74,7 @@ class Command(BaseCommand):
             print('qs.count() : ', qs.count())
             self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
             if qs.count() > 0:
-                send_mail(user, qs[0].image.url)
+                send_mail(user, qs[0].image.url, qs[0].id)
 
         self.stdout.write(self.style.SUCCESS('sent email'))
         # except:

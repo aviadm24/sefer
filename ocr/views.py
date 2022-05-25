@@ -218,13 +218,27 @@ class TaharaImageUpdateView(PermissionRequiredMixin, UpdateView):
 
 
 def send_email(request):
+    # t = TaharaImage()
+    image_url = TaharaImage.objects.first().image.url
+    context = {
+        'image_url': image_url,
+        'image_id':  TaharaImage.objects.first().id
+    }
+    print(image_url)
     message = Mail(
         from_email='aviadm32@gmail.com',
         to_emails='aviadm24@gmail.com',
         subject="מחקר מראות מכון פועה",
-        html_content=render_to_string('ocr/email.html'))
+        html_content=render_to_string('ocr/email.html', context))
     try:
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        try:
+            print(os.getcwd())
+            with open('sendgrid_key.txt', 'r') as f:
+                key = f.readline()
+            print('key: ', key)
+            sg = SendGridAPIClient(key)
+        except:
+            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
         print(response.status_code)
         print(response.body)
@@ -268,7 +282,7 @@ def incoming_sms(request):
         if image_id and answer in ["1", "2", "3", "4", "5"]:
             print("Incoming SMS with ID: {}, answer: {}".format(image_id, answer))
             answers_choice = Answers.objects.get(pk=int(answer))
-            TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice)
+            TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice, showed_to="sms")
             print("update success")
         else:
             print("Invalid SMS")
@@ -276,6 +290,27 @@ def incoming_sms(request):
 
         return HttpResponse("")
 
+
+def incoming_answer_from_email(request):
+    if request.method == "GET":
+        print(request)
+        print(request.GET)
+        print(request.GET.items())
+        image_id = request.GET["id"]
+        answer = request.GET["answer"]
+        print(image_id)
+        print(answer)
+        print(type(answer))
+        if image_id and answer in ["1", "2", "3", "4", "5"]:
+            print("Incoming email with ID: {}, answer: {}".format(image_id, answer))
+            answers_choice = Answers.objects.get(pk=int(answer))
+            TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice, showed_to="email")
+            print("update success")
+        else:
+            print("Invalid email")
+            return HttpResponse("חלה שגיאה התשובה לא התקבלה")
+
+        return HttpResponse("תשובתך התקבלה בהצלחה תודה")
 
 @csrf_exempt
 def image_upload(request):

@@ -8,6 +8,16 @@
     <p>שלום לרבני המכון</p>
     <p>נא ללחוץ כדי להכנס לפסוק על העדים של מחקר העדים של מכון פועה</p>
     <a href="http://www.toracomments.com/ocr/list_image/">Click</a>
-    <p><img src="cid:{{ image_url }}"></p>
+    <p>image: <img src="{{ image_url }}"></p>
+<a href="{context['image_url']}">
+    תמונה
+    </a>
+    <h2>לחצו על הקישור המתאים על מנת לפסוק</h2>
+
+<a href="http://www.toracomments.com/ocr/incoming_answer_from_email?id={{image_id}}&answer=1">טמא ברור</a>
+<a href="http://www.toracomments.com/ocr/incoming_answer_from_email?id={{image_id}}&answer=2">טמא מסובך</a>
+<a href="http://www.toracomments.com/ocr/incoming_answer_from_email?id={{image_id}}&answer=3">טהור מסובך</a>
+<a href="http://www.toracomments.com/ocr/incoming_answer_from_email?id={{image_id}}&answer=4">טהור ברור</a>
+<a href="http://www.toracomments.com/ocr/incoming_answer_from_email?id={{image_id}}&answer=5">פצע</a>
 </body>
 </html>

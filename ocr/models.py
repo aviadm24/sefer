@@ -16,7 +16,7 @@ class Answers(models.Model):
     choice = models.CharField(max_length=250)
 
     def __str__(self):
-        return self.choice
+        return "answer %s: %s" % (self.pk, self.choice)
 
 
 class Light(models.Model):

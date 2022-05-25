@@ -1,14 +1,32 @@
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-
+from django.template.loader import render_to_string
+context = {
+    'image_url': "https://res.cloudinary.com/heodokrl4/image/upload/v1653258970/vxwhupw2zzav3cykprpy.jpg",
+}
 message = Mail(
     from_email='aviadm32@gmail.com',
     to_emails='aviadm24@gmail.com',
     subject='Sending with Twilio SendGrid is Fun',
-    html_content='<strong>and easy to do anywhere, even with Python</strong>')
+    html_content=f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>title</title>
+</head>
+<body>
+    <p>שלום לרבני המכון</p>
+    <p>נא ללחוץ כדי להכנס לפסוק על העדים של מחקר העדים של מכון פועה</p>
+    <a href="http://www.toracomments.com/ocr/list_image/">Click</a>
+    <p>image: <img src="{context['image_url']}"></p>
+    <a href="{context['image_url']}">
+    תמונה
+    </a>
+</body>
+</html>""")
 try:
-    sg = SendGridAPIClient("os.environ.get('SENDGRID_API_KEY')")
+    sg = SendGridAPIClient("")
     response = sg.send(message)
     print(response.status_code)
     print(response.body)

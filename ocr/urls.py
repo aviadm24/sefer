@@ -26,4 +26,5 @@ urlpatterns = [
     path('update_image/<slug:pk>/', views.TaharaImageUpdateView.as_view(), name='TaharaImageUpdateView'),
     path('incoming_sms/', views.incoming_sms, name='incoming_sms'),
     path('send_email/', views.send_email, name='send_email'),
+    path('incoming_answer_from_email/', views.incoming_answer_from_email, name='incoming_answer_from_email'),
 ]
