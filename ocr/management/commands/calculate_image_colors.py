@@ -77,7 +77,11 @@ class Command(BaseCommand):
 
     # https://stackoverflow.com/questions/41401202/django-command-throws-typeerror-handle-got-an-unexpected-keyword-argument
     def handle(self, *args, **options):
+        for t in TaharaImage.objects.all():
+            print(t.id)
+            print(t.color_percentage)
         qs = TaharaImage.objects.filter(color_percentage__exact={})
+
         print('qs.count() : ', qs.count())
         if qs.count() > 0:
             url = qs[0].image.url
