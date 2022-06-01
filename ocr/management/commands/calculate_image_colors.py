@@ -77,9 +77,9 @@ class Command(BaseCommand):
 
     # https://stackoverflow.com/questions/41401202/django-command-throws-typeerror-handle-got-an-unexpected-keyword-argument
     def handle(self, *args, **options):
-        for t in TaharaImage.objects.all():
-            print(t.id)
-            print(t.color_percentage)
+        # for t in TaharaImage.objects.all():
+        #     print(t.id)
+        #     print(t.color_percentage)
         qs = TaharaImage.objects.filter(color_percentage__exact={})
 
         print('qs.count() : ', qs.count())
@@ -89,8 +89,10 @@ class Command(BaseCommand):
             img = Image.open(BytesIO(response.content))
             # image1 = image_to_color_percentage(img)
             color_percentage = process_img(img)
-            qs[0].color_percentage = dict(image1=color_percentage)
-            qs[0].save()
+            image_instance = qs[0]
+            image_instance.color_percentage = dict(image1=color_percentage)
+            image_instance.save()  #update_fields=color_percentage
+            print('image_instance.color_percentage : ', image_instance.color_percentage)
 
             self.stdout.write(self.style.SUCCESS('Successfully calculated color percent'))
         return
