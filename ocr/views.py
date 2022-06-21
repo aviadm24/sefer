@@ -31,6 +31,12 @@ from django.core.mail import EmailMultiAlternatives
 import urllib.parse as pr
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+import os
+import clicksend_client
+from clicksend_client import SmsMessage, MmsMessage
+from clicksend_client.rest import ApiException
+from pprint import pprint
+import ast
 
 
 def send_mail(user):
@@ -306,6 +312,71 @@ def incoming_answer_from_email(request):
             return HttpResponse("חלה שגיאה התשובה לא התקבלה")
 
         return HttpResponse("תשובתך התקבלה בהצלחה תודה")
+
+
+def test_sms(request):
+    print("test sms")
+    if request.GET:
+        print("test get")
+        try:
+            configuration = clicksend_client.Configuration()
+            configuration.username = os.environ.get('CLICKSEND_USERNAME', '')
+            configuration.password = os.environ.get('CLICKSEND_PASSWORD', '')
+            api_instance = clicksend_client.SMSApi(clicksend_client.ApiClient(configuration))
+
+            def send_sms(image_url, image_id, rabbi_phone_num):
+                sms_message = SmsMessage(source="toracomments",
+                                         body="{}\nimage_id#{}\n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n5 פצע".
+                                         format(image_url, image_id),
+                                         to="+972{}".format(rabbi_phone_num))
+
+                sms_messages = clicksend_client.SmsMessageCollection(messages=[sms_message])
+                try:
+                    # Send sms message(s)
+                    api_response = api_instance.sms_send_post(sms_messages)
+                    print(api_response)
+                except ApiException as e:
+                    print("Exception when calling SMSApi->sms_send_post: %s\n" % e)
+            user = request.user
+            qs = TaharaImage.objects.filter(rabbi_name=user).filter(second_pesak__exact=None)
+
+            send_sms(qs[0].image.url, qs[0].id, user.first_name)
+            print(f"sent sms to {user} at number {user.first_name}")
+            return HttpResponse(f" סמס בדיקה נשלח ל{user.first_name}  {user}  תודה")
+        except:
+            print("an error accoured")
+            return HttpResponse(f"חלה תקלה הסמס {user.first_name}  {user} לא נשלח!")
+    else:
+        print('not get')
+        try:
+            configuration = clicksend_client.Configuration()
+            configuration.username = os.environ.get('CLICKSEND_USERNAME', '')
+            configuration.password = os.environ.get('CLICKSEND_PASSWORD', '')
+            api_instance = clicksend_client.SMSApi(clicksend_client.ApiClient(configuration))
+
+            def send_sms(image_url, image_id, rabbi_phone_num):
+                sms_message = SmsMessage(source="toracomments",
+                                         body="{}\nimage_id#{}\n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n5 פצע".
+                                         format(image_url, image_id),
+                                         to="+972{}".format(rabbi_phone_num))
+
+                sms_messages = clicksend_client.SmsMessageCollection(messages=[sms_message])
+                try:
+                    # Send sms message(s)
+                    api_response = api_instance.sms_send_post(sms_messages)
+                    print(api_response)
+                except ApiException as e:
+                    print("Exception when calling SMSApi->sms_send_post: %s\n" % e)
+            user = request.user
+            qs = TaharaImage.objects.filter(rabbi_name=user).filter(second_pesak__exact=None)
+
+            send_sms(qs[0].image.url, qs[0].id, user.first_name)
+            print(f"sent sms to {user} at number {user.first_name}")
+            return HttpResponse(f" סמס בדיקה נשלח ל{user.first_name}  {user}  תודה")
+        except:
+            print("an error accoured")
+            return HttpResponse(f"חלה תקלה הסמס {user.first_name}  {user} לא נשלח!")
+    return HttpResponse(f"error")
 
 @csrf_exempt
 def image_upload(request):
