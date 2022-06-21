@@ -369,10 +369,12 @@ def test_sms(request):
                     print("Exception when calling SMSApi->sms_send_post: %s\n" % e)
             user = request.user
             qs = TaharaImage.objects.filter(rabbi_name=user).filter(second_pesak__exact=None)
-
-            send_sms(qs[0].image.url, qs[0].id, user.first_name)
-            print(f"sent sms to {user} at number {user.first_name}")
-            return HttpResponse(f" סמס בדיקה נשלח ל{user.first_name}  {user}  תודה")
+            if len(qs) > 0:
+                send_sms(qs[0].image.url, qs[0].id, user.first_name)
+                print(f"sent sms to {user} at number {user.first_name}")
+                return HttpResponse(f" סמס בדיקה נשלח ל{user.first_name}  {user}  תודה")
+            else:
+                print(f'{user} dosnt have any images')
         except:
             print("an error accoured")
             return HttpResponse(f"חלה תקלה הסמס {user.first_name}  {user} לא נשלח!")
