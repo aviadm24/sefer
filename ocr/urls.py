@@ -28,4 +28,5 @@ urlpatterns = [
     path('send_email/', views.send_email, name='send_email'),
     path('test_sms/', views.test_sms, name='test_sms'),
     path('incoming_answer_from_email/', views.incoming_answer_from_email, name='incoming_answer_from_email'),
+    path('image_dashboard/', views.cloudinary_list, name='image_dashboard'),
 ]

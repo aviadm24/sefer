@@ -60,18 +60,6 @@ def send_mail(user):
 MIN_WAITING_TIME = 1
 
 
-# def send_email(user):
-#     subject = "מחקר מראות מכון פועה"
-#     from_email, to = None, user.email
-#     text_content = 'Text'
-#     html_content = render_to_string(
-#         'ocr/email.html')
-#     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-#     msg.attach_alternative(html_content, "text/html")
-#     msg.send()
-#     print('sending mail')
-
-
 def image_to_color_percentage(image_file):
     img = Image.open(image_file)
     size = w, h = img.size
@@ -173,17 +161,6 @@ def TaharaImageCreateView(request):
                     user.last_login = timezone.now()
                     user.save(update_fields=['last_login'])
     return render(request, 'ocr/taharaImage_create.html', {'form': form})
-
-# class TaharaImageCreateView(CreateView):
-#     # model = TaharaImage
-#     form_class = TaharaImageForm
-#     template_name = 'ocr/taharaImage_create.html'
-#     success_url = reverse_lazy('TaharaImageListView')
-
-    # def get_form_kwargs(self):
-    #     kwargs = {'rabbi_name': self.request.user, }
-    #     print("kwargs: ", kwargs)
-    #     return kwargs
 
 
 class TaharaImageListView(PermissionRequiredMixin, ListView):
@@ -380,58 +357,6 @@ def test_sms(request):
             return HttpResponse(f"חלה תקלה הסמס {user.first_name}  {user} לא נשלח!")
     return HttpResponse(f"error")
 
-@csrf_exempt
-def image_upload(request):
-    if request.is_ajax():
-        image_file = os.listdir('ocr/static/images/')
-        uploaded_file_url = os.path.join('ocr/static/images/', image_file[0])
-        print('uploaded_file_url: ', uploaded_file_url)
-        answers = data(uploaded_file_url)
-        print(answers)
-        json_response = {'answers': answers}
-
-        return HttpResponse(json.dumps(json_response),
-                            content_type='application/json')
-
-    if request.method == 'POST' and request.FILES['image']:
-        file = request.FILES['image']
-        try:
-            handler = Image.open(file)
-            encoded_string = base64.b64encode(file.read()).decode('utf8')
-            # print(encoded_string)
-            try:
-                text = plain_ocr(handler, 'heb')
-            except:
-                text = ''
-        except:
-            text = file.read().decode('utf8')
-            print("text: ", text)
-            encoded_string = ''
-        response = {
-            'text': text,
-            'base64': encoded_string
-        }
-        return JsonResponse(response)
-        # return render(request, 'ocr/image_upload.html', {
-        #     'text': text,
-        #     'base64': encoded_string
-        #     })
-
-    return render(request, 'ocr/upload_form.html')
-
-@csrf_exempt
-def ocr_output(request):
-    if request.method == 'POST' and request.FILES['image']:
-        myfile = request.FILES['image']
-        # print(myfile)
-        image = Image.open(myfile)
-        text = plain_ocr(image, 'heb')
-        data = {"ocr-text": text}
-        # json_data = json.dumps(data, ensure_ascii=False).encode('utf8')
-        return JsonResponse(json.dumps(data, ensure_ascii=False), safe=False)
-
-    return render(request, 'ocr/ocr_output.html')
-
 
 def filter_nones(d):
     return dict((k, v) for k, v in six.iteritems(d) if v is not None)
@@ -452,50 +377,3 @@ def cloudinary_list(request):
         print(img.image)
     return render(request, 'ocr/cloudinary_list.html', dict(photos=TaharaImage.objects.all(), samples=samples))
 
-
-def upload(request):
-    unsigned = request.GET.get("unsigned") == "true"
-
-    if (unsigned):
-        # For the sake of simplicity of the sample site, we generate the preset on the fly.
-        # It only needs to be created once, in advance.
-        try:
-            api.upload_preset(PhotoUnsignedDirectForm.upload_preset_name)
-        except api.NotFound:
-            api.create_upload_preset(name=PhotoUnsignedDirectForm.upload_preset_name, unsigned=True,
-                                     folder="preset_folder")
-
-    direct_form = PhotoUnsignedDirectForm() if unsigned else PhotoDirectForm()
-    context = dict(
-        # Form demonstrating backend upload
-        backend_form=PhotoForm(),
-        # Form demonstrating direct upload
-        direct_form=direct_form,
-        # Should the upload form be unsigned
-        unsigned=unsigned,
-    )
-    # When using direct upload - the following call is necessary to update the
-    # form's callback url
-    cl_init_js_callbacks(context['direct_form'], request)
-
-    if request.method == 'POST':
-        # Only backend upload should be posting here
-        form = PhotoForm(request.POST, request.FILES)
-        context['posted'] = form.instance
-        if form.is_valid():
-            # Uploads image and creates a model instance for it
-            form.save()
-
-    return render(request, 'upload.html', context)
-
-
-def direct_upload_complete(request):
-    form = PhotoDirectForm(request.POST)
-    if form.is_valid():
-        # Create a model instance for uploaded image using the provided data
-        form.save()
-        ret = dict(photo_id=form.instance.id)
-    else:
-        ret = dict(errors=form.errors)
-
-    return HttpResponse(json.dumps(ret), content_type='application/json')
