@@ -20,6 +20,7 @@ from django.utils import timezone
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import F, Q
 from io import StringIO
 from PIL import Image
 import json
@@ -356,6 +357,35 @@ def test_sms(request):
             print("an error accoured")
             return HttpResponse(f"חלה תקלה הסמס {user.first_name}  {user} לא נשלח!")
     return HttpResponse(f"error")
+
+
+def image_dashboard(request):
+    labels = []
+    data = []
+
+    samePesakQueryset = TaharaImage.objects.filter(first_pesak=F('second_pesak'))
+    notSamePesakQueryset = TaharaImage.objects.filter(~Q(first_pesak=F('second_pesak')))
+    defaults = dict(format="jpg", height=150, width=150)
+    defaults["class"] = "thumbnail inline"
+
+    # The different transformations to present
+    samples = [
+        dict(crop="fill", radius=10),
+        dict(crop="scale"),
+        dict(crop="fit", format="png"),
+    ]
+    samples = [filter_nones(dict(defaults, **sample)) for sample in samples]
+    for img in TaharaImage.objects.all():
+        print(img.image)
+    return render(request, 'ocr/cloudinary_list.html', dict(photos=samePesakQueryset, samples=samples))
+    # for entry in queryset:
+    #     labels.append(entry['country__name'])
+    #     data.append(entry['country_population'])
+    #
+    # return JsonResponse(data={
+    #     'labels': labels,
+    #     'data': data,
+    # })
 
 
 def filter_nones(d):

@@ -19,7 +19,6 @@ from . import views
 
 urlpatterns = [
     path('', views.home),
-    path('image_upload/', views.image_upload, name='upload'),
     path('upload_image/', views.TaharaImageCreateView, name='TaharaImageCreateView'),
     path('list_image/', views.TaharaImageListView.as_view(), name='TaharaImageListView'),
     # path('list_image/', views.cloudinary_list, name='TaharaImageListView'),
@@ -28,5 +27,5 @@ urlpatterns = [
     path('send_email/', views.send_email, name='send_email'),
     path('test_sms/', views.test_sms, name='test_sms'),
     path('incoming_answer_from_email/', views.incoming_answer_from_email, name='incoming_answer_from_email'),
-    path('image_dashboard/', views.cloudinary_list, name='image_dashboard'),
+    path('image_dashboard/', views.image_dashboard, name='image_dashboard'),
 ]
