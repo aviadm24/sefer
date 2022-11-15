@@ -413,6 +413,10 @@ def image_dashboard(request):
     # })
 
 
+def tahara_image_explanation(request):
+    return render(request, 'ocr/tahara_image_explanation.html')
+
+
 def filter_nones(d):
     return dict((k, v) for k, v in six.iteritems(d) if v is not None)
 

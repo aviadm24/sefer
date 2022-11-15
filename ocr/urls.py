@@ -28,4 +28,5 @@ urlpatterns = [
     path('test_sms/', views.test_sms, name='test_sms'),
     path('incoming_answer_from_email/', views.incoming_answer_from_email, name='incoming_answer_from_email'),
     path('image_dashboard/', views.image_dashboard, name='image_dashboard'),
+    path('tahara_image_explanation/', views.tahara_image_explanation, name='tahara_image_explanation'),
 ]
