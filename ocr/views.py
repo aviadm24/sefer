@@ -21,8 +21,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Q
-from io import StringIO
 from PIL import Image
+import matplotlib.pyplot as plt
+from io import StringIO
+import numpy as np
 import json
 from .ocr_functions import data, word_list_dict, heb_digit
 from cloudinary.forms import cl_init_js_callbacks
@@ -359,25 +361,48 @@ def test_sms(request):
     return HttpResponse(f"error")
 
 
+def return_graph():
+
+    x = np.arange(0,np.pi*3,.1)
+    y = np.sin(x)
+
+    fig = plt.figure()
+    plt.plot(x,y)
+
+    imgdata = StringIO()
+    fig.savefig(imgdata, format='svg')
+    imgdata.seek(0)
+
+    data = imgdata.getvalue()
+    return data
+
+
 def image_dashboard(request):
     labels = []
     data = []
 
     samePesakQueryset = TaharaImage.objects.filter(first_pesak=F('second_pesak'))
-    notSamePesakQueryset = TaharaImage.objects.filter(~Q(first_pesak=F('second_pesak')))
+    diffPesakQueryset = TaharaImage.objects.filter(~Q(first_pesak=F('second_pesak')))
+    # samePesakQueryDict = dict(zip([i for i in range(len(samePesakQueryset))], samePesakQueryset))
+    # diffPesakQueryDict = dict(zip([i for i in range(len(diffPesakQueryset))], diffPesakQueryset))
+    photos = zip(samePesakQueryset, diffPesakQueryset)
     defaults = dict(format="jpg", height=150, width=150)
     defaults["class"] = "thumbnail inline"
 
     # The different transformations to present
     samples = [
-        dict(crop="fill", radius=10),
+        dict(crop="fill", radius=20),
         dict(crop="scale"),
         dict(crop="fit", format="png"),
     ]
     samples = [filter_nones(dict(defaults, **sample)) for sample in samples]
-    for img in TaharaImage.objects.all():
-        print(img.image)
-    return render(request, 'ocr/cloudinary_list.html', dict(photos=samePesakQueryset, samples=samples))
+    # for img in TaharaImage.objects.all():
+    #     print(img.image)
+    # graph = return_graph()
+    return render(request, 'ocr/image_dashboard.html', dict(photos=photos,
+                                                            samples=samples,
+                                                            # graph=graph
+                                                            ))
     # for entry in queryset:
     #     labels.append(entry['country__name'])
     #     data.append(entry['country_population'])
