@@ -22,11 +22,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Q
 from PIL import Image
-import matplotlib.pyplot as plt
-from io import StringIO
+# import matplotlib.pyplot as plt
+# from io import StringIO
 import numpy as np
 import json
-from .ocr_functions import data, word_list_dict, heb_digit
 from cloudinary.forms import cl_init_js_callbacks
 import six
 from django.core.mail import send_mail
@@ -361,20 +360,20 @@ def test_sms(request):
     return HttpResponse(f"error")
 
 
-def return_graph():
-
-    x = np.arange(0,np.pi*3,.1)
-    y = np.sin(x)
-
-    fig = plt.figure()
-    plt.plot(x,y)
-
-    imgdata = StringIO()
-    fig.savefig(imgdata, format='svg')
-    imgdata.seek(0)
-
-    data = imgdata.getvalue()
-    return data
+# def return_graph():
+#
+#     x = np.arange(0,np.pi*3,.1)
+#     y = np.sin(x)
+#
+#     fig = plt.figure()
+#     plt.plot(x,y)
+#
+#     imgdata = StringIO()
+#     fig.savefig(imgdata, format='svg')
+#     imgdata.seek(0)
+#
+#     data = imgdata.getvalue()
+#     return data
 
 
 def image_dashboard(request):
