@@ -15,6 +15,8 @@
 # """
 from django.urls import path, include, re_path
 from . import views
+from django.contrib.auth.decorators import login_required
+
 urlpatterns = [
     path('', views.home, name="home"),
     path('index/<int:number>/', views.index, name="index"),
@@ -22,7 +24,7 @@ urlpatterns = [
     re_path(r"^api/texts/(?P<slug>[a-zA-Z0-9,'_:. +-]*)/$", views.texts),
     # re_path(r"^api/commentators/(?P<slug>[a-zA-Z0-9,'_:. +-]*)/$", views.texts_with_commentators),
     path('get_comment/', views.get_comment, name='validate_username'),
-    path('profile/', views.YcommentListView.as_view(), name='ycomment-list'),
+    path('profile/', login_required(views.YcommentListView.as_view()), name='ycomment-list'),
     path('add_comment/', views.add_comment, name="add_comment"),
     path('remove_comment/<int:id>/', views.remove_comment, name="remove_comment"),
     path('is_authenticated/', views.is_authenticated),

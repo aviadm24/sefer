@@ -375,7 +375,7 @@ def test_sms(request):
 #     data = imgdata.getvalue()
 #     return data
 
-
+@login_required()
 def image_dashboard(request):
     labels = []
     data = []
