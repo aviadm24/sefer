@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from .models import Ycomment, Yfiles
+from allauth.account.forms import SignupForm
 
 
 class YcommentForm(ModelForm):
@@ -47,3 +48,24 @@ class FileUploadForm(forms.Form):
             instance.save()
         return instance
 
+
+class MyCustomSignupForm(SignupForm):
+    first_name = forms.CharField(max_length=30)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["first_name"].label = "phone number"
+        # self.fields["password"].label = ""
+
+    def save(self, request):
+
+        # Ensure you call the parent class's save.
+        # .save() returns a User object.
+        user = super(MyCustomSignupForm, self).save(request)
+
+        # Add your own processing here.
+        user.first_name = self.cleaned_data['first_name']
+        user.save()
+        # You must return the original result.
+        return user

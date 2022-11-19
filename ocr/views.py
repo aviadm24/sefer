@@ -375,11 +375,11 @@ def test_sms(request):
 #     data = imgdata.getvalue()
 #     return data
 
-@login_required()
+# @login_required()
+@permission_required('ocr.add_taharaimage', raise_exception=True)
 def image_dashboard(request):
     labels = []
     data = []
-
     samePesakQueryset = TaharaImage.objects.filter(first_pesak=F('second_pesak'))
     diffPesakQueryset = TaharaImage.objects.filter(~Q(first_pesak=F('second_pesak')))
     # samePesakQueryDict = dict(zip([i for i in range(len(samePesakQueryset))], samePesakQueryset))
