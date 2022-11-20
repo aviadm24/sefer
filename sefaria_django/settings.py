@@ -99,30 +99,51 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-EMAIL_HOST = os.environ.get('CLOUDIN_HOST', '')
-EMAIL_HOST_USER = os.environ.get('CLOUDIN_USERNAME', '')
-EMAIL_HOST_PASSWORD = os.environ.get('CLOUDIN_PASSWORD', '')
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# EMAIL_HOST = os.environ.get('CLOUDIN_HOST', '')
+# EMAIL_HOST_USER = os.environ.get('CLOUDIN_USERNAME', '')
+# EMAIL_HOST_PASSWORD = os.environ.get('CLOUDIN_PASSWORD', '')
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
 
 # EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', '')
 # EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '')
 # EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', '')
 # EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', '')
-if EMAIL_HOST == '':
-    creds = []
-    try:
-        with open("mailgun.txt", "r") as f:
-            for line in f.readlines():
-                creds.append(line)
-        EMAIL_HOST = creds[0].strip()
-        EMAIL_PORT = creds[1].strip()
-        EMAIL_HOST_USER = creds[2].strip()
-        EMAIL_HOST_PASSWORD = creds[3].strip()
-    except FileNotFoundError:
-        print("no mailgun.txt file found!")
-DEFAULT_FROM_EMAIL = "email@www.torracomments.com"  # 'toracomments@gmail.com'
+# if EMAIL_HOST == '':
+#     creds = []
+#     try:
+#         with open("mailgun.txt", "r") as f:
+#             for line in f.readlines():
+#                 creds.append(line)
+#         EMAIL_HOST = creds[0].strip()
+#         EMAIL_PORT = creds[1].strip()
+#         EMAIL_HOST_USER = creds[2].strip()
+#         EMAIL_HOST_PASSWORD = creds[3].strip()
+#     except FileNotFoundError:
+#         print("no mailgun.txt file found!")
+# DEFAULT_FROM_EMAIL = "email@www.torracomments.com"  # 'toracomments@gmail.com'
 # print("EMAIL_HOST: ", EMAIL_HOST)
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+DEFAULT_FROM_EMAIL = 'aviadm32@gmail.com'  # this is the sendgrid email
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+if EMAIL_HOST_PASSWORD == '':
+    try:
+        with open("sendgrid_key.txt", "r") as f:
+            EMAIL_HOST_PASSWORD = f.readline().strip()
+        with open("sendgrid_key.txt", "r") as f:
+            SENDGRID_API_KEY = f.readline().strip()
+        print('EMAIL_HOST_PASSWORD: ', EMAIL_HOST_PASSWORD)
+    except FileNotFoundError:
+        print("no sendgrid_key.txt file found!")
+
+# ACCOUNT_EMAIL_VERIFICATION = 'none'
 LOGIN_REDIRECT_URL = "/"
 # LOGIN_REQUIRED_IGNORE_PATHS = [
 #     r'/accounts/login/$',
