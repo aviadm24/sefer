@@ -5,11 +5,14 @@
 <div class="container">
     <h4>הוראות</h4>
     <p>שלב ראשון: מעלים את תמונת המראה יחד עם פסיקה ראשונית על המראה הפיסי, בתוספת פרטים נוספים על תנאי הצילום של המראה</p>
-    <img src="{% static 'main/images/example1.jpg' %}" alt="My image" width="200" height="300">
-    <img src="{% static 'main/images/example2.jpg' %}" alt="My image" width="200" height="300">
+    <p>דוגמא של תמונה טובה כיוון שאין בה שוליים מעבר לדף הלבן ויש בה פקק אדום:</p>
+    <img src="{% static 'main/images/example1.jpg' %}" alt="My image" height="60%" width="60%">
+    <p>דוגמא של תמונה לא טובה כיוון שיש בה שוליים מעבר לדף הלבן:</p>
+    <img src="{% static 'main/images/example2.jpg' %}" alt="My image" height="60%" width="60%">
     <p>שלב שני: יש מס' ימים מוגדר מראש של הפסקה בין הפסיקה הראשונה לבין הפסיקה השניה על התמונה</p>
     <p>שלב שלישי: נשלח סמס לפסיקה על העדים לפי תמונה</p>
-    <img src="{% static 'main/images/sms.jpeg' %}" alt="My image" width="200" height="300">
+    <p>דוגמא של סמס שאמורים לקבל לאחר זמן:</p>
+    <img src="{% static 'main/images/sms.jpeg' %}" alt="My image" height="50%" width="50%">
     <p>שלב רביעי: כל רב נכנס לאתר לרשימת המראות שהוא פסק עליהם ופוסק עליהם שוב דרך המסך</p>
     <h4 style="padding: 3rem"> טופס העלאת תמונות של מראות ופסיקה ראשונית</h4>
     <form action="" method="post" enctype="multipart/form-data">
