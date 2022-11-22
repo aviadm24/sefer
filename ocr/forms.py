@@ -8,6 +8,8 @@ class TaharaImageForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(TaharaImageForm, self).__init__(*args, **kwargs)
+        self.fields['first_pesak'].required = True
+        self.fields['image'].required = True
 
     class Meta:
         model = TaharaImage

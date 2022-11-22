@@ -118,7 +118,7 @@ if EMAIL_HOST_PASSWORD == '':
     except FileNotFoundError:
         print("no sendgrid_key.txt file found!")
 
-# ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 LOGIN_REDIRECT_URL = "/"
 # LOGIN_REQUIRED_IGNORE_PATHS = [
 #     r'/accounts/login/$',

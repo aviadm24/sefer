@@ -3,8 +3,8 @@
 
 {% block content %}
 <div class="container">
-    <h4 style="padding: 3rem">רשימת מראות שעדיין לא פסקו עליהם פעם שניה</h4>
-    <h4>הועלו סה"כ {{number_of_edim_uploaded}} עדים</h4>
+<!--    <h4 style="padding: 3rem">רשימת מראות שעדיין לא פסקו עליהם פעם שניה</h4>-->
+    <h4>הרב {{request.user}} העלה סה"כ {{number_of_edim_uploaded}} עדים</h4>
     <h4><a href="{% url 'TaharaImageCreateView' %}">להעלאה תמונות של מראה חדש</a></h4>
     <ul>
         <!-- Iterate over object_list -->
@@ -28,7 +28,7 @@
         <hr/>
         <!-- If objet_list is empty  -->
         {% empty %}
-        <li>אין עדים לפסוק עליהם</li>
+        <li>סמס ישלח עם עדים שעדיין לא פסקו עליהם לאחר 7 ימים</li>
         {% endfor %}
         {% if additional_explanation %}
         <p>{{additional_explanation}}</p>

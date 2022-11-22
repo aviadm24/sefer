@@ -59,7 +59,7 @@ def send_mail(user):
     except Exception as e:
         print(e.message)
 
-MIN_WAITING_TIME = 1
+MIN_WAITING_TIME = 7
 
 
 def image_to_color_percentage(image_file):
@@ -184,6 +184,7 @@ class TaharaImageListView(PermissionRequiredMixin, ListView):
         return context
 
     def get_queryset(self):
+        print('delta: ', datetime.now() - timedelta(days=MIN_WAITING_TIME))
         qs = TaharaImage.objects.filter(rabbi_name=self.request.user).\
             filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(second_pesak__exact=None)
         return qs
