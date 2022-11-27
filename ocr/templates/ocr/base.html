@@ -33,6 +33,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script src="{% static 'main/js/bootConfirm.js' %}"></script>
   <!-- Menu Toggle Script -->
-    {% block javascript %}{% endblock %}
+{% block javascript %}{% endblock %}
+<script>
+    $('#image_form').submit(function(event){
+    $('#submit_image').attr('disabled', true);
+    });
+</script>
 </body>
 </html>
