@@ -29,4 +29,7 @@ urlpatterns = [
     path('incoming_answer_from_email/', views.incoming_answer_from_email, name='incoming_answer_from_email'),
     path('image_dashboard/', views.image_dashboard, name='image_dashboard'),
     path('tahara_image_explanation/', views.tahara_image_explanation, name='tahara_image_explanation'),
+path('incoming_whatsapp/', views.incoming_whatsapp, name='incoming_whatsapp'),
+path('incoming_whatsapp_fb/', views.incoming_whatsapp_fb, name='incoming_whatsapp_fb'),
+path('incoming_whatsapp_status/', views.incoming_whatsapp_status, name='incoming_whatsapp_status'),
 ]

@@ -436,3 +436,13 @@ def cloudinary_list(request):
         print(img.image)
     return render(request, 'ocr/cloudinary_list.html', dict(photos=TaharaImage.objects.all(), samples=samples))
 
+
+def incoming_whatsapp(request):
+    sender = request.form.get('From')
+    message = request.form.get('Body')
+    media_url = request.form.get('MediaUrl0')
+    print(f'{sender} sent {message} media {media_url}')
+    if media_url:
+        return HttpResponse('Thank you! Your image was received.')
+    else:
+        return HttpResponse(f'Please send an image!')
