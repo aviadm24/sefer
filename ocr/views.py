@@ -39,7 +39,8 @@ from clicksend_client import SmsMessage, MmsMessage
 from clicksend_client.rest import ApiException
 from pprint import pprint
 import ast
-
+from twilio.twiml.messaging_response import MessagingResponse
+import cloudinary
 
 def send_mail(user):
     context = {
@@ -437,6 +438,12 @@ def cloudinary_list(request):
     return render(request, 'ocr/cloudinary_list.html', dict(photos=TaharaImage.objects.all(), samples=samples))
 
 
+def respond(message):
+    response = MessagingResponse()
+    response.message(message)
+    return str(response)
+
+
 @csrf_exempt
 def incoming_whatsapp(request):
     if request.POST:
@@ -444,11 +451,19 @@ def incoming_whatsapp(request):
         sender = request.POST.get('From')
         message = request.POST.get('Body')
         media_url = request.POST.get('MediaUrl0')
-        print(f'whatsapp status: {sender} sent {message} media {media_url}')
+        print(f'whatsapp: {sender} sent {message} media {media_url}')
+        res = cloudinary.uploader.upload(media_url)
+        print(f'cloudinary res : {res}')
+        tahara_image = TaharaImage.objects.update_or_create(rabbi_name='aviad')
+        tahara_image.first_pesak = message
+        tahara_image.image = media_url
+        tahara_image.save()
+        print(f'tahara image saved in db')
+        # Answers.objects.all()
         if media_url:
-            return HttpResponse('Thank you! Your image was received.')
+            return respond('Thank you! Your image was received.')
         else:
-            return HttpResponse(f'Please send an image!')
+            return respond(f'Please send an image!')
 
 
 @csrf_exempt
@@ -460,9 +475,9 @@ def incoming_whatsapp_fb(request):
         media_url = request.POST.get('MediaUrl0')
         print(f'whatsapp status: {sender} sent {message} media {media_url}')
         if media_url:
-            return HttpResponse('Thank you! Your image was received.')
+            return respond('Thank you! Your image was received.')
         else:
-            return HttpResponse(f'Please send an image!')
+            return respond(f'Please send an image!')
 
 
 @csrf_exempt
