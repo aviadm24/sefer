@@ -454,8 +454,8 @@ def incoming_whatsapp(request):
         print(f'whatsapp: {sender} sent {message} media {media_url}')
         res = cloudinary.uploader.upload(media_url)
         print(f'cloudinary res : {res}')
-        user = User.objects.filter(username='aviad')
-        answer = Answers.objects.filter(choice=message)
+        user = User.objects.get(username='aviad')
+        answer = Answers.objects.get(choice=message)
         tahara_image = TaharaImage.objects.create(rabbi_name=user)
         tahara_image.first_pesak = answer
         tahara_image.image = media_url
