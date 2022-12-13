@@ -437,6 +437,7 @@ def cloudinary_list(request):
     return render(request, 'ocr/cloudinary_list.html', dict(photos=TaharaImage.objects.all(), samples=samples))
 
 
+@csrf_exempt
 def incoming_whatsapp(request):
     if request.POST:
         print(request.POST)
@@ -450,6 +451,7 @@ def incoming_whatsapp(request):
             return HttpResponse(f'Please send an image!')
 
 
+@csrf_exempt
 def incoming_whatsapp_fb(request):
     if request.POST:
         print(request.POST)
@@ -463,6 +465,7 @@ def incoming_whatsapp_fb(request):
             return HttpResponse(f'Please send an image!')
 
 
+@csrf_exempt
 def incoming_whatsapp_status(request):
     if request.POST:
         print(request.POST)
