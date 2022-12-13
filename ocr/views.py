@@ -438,11 +438,37 @@ def cloudinary_list(request):
 
 
 def incoming_whatsapp(request):
-    sender = request.form.get('From')
-    message = request.form.get('Body')
-    media_url = request.form.get('MediaUrl0')
-    print(f'{sender} sent {message} media {media_url}')
-    if media_url:
-        return HttpResponse('Thank you! Your image was received.')
-    else:
-        return HttpResponse(f'Please send an image!')
+    if request.POST:
+        print(request.POST)
+        sender = request.POST.get('From')
+        message = request.POST.get('Body')
+        media_url = request.POST.get('MediaUrl0')
+        print(f'whatsapp status: {sender} sent {message} media {media_url}')
+        if media_url:
+            return HttpResponse('Thank you! Your image was received.')
+        else:
+            return HttpResponse(f'Please send an image!')
+
+def incoming_whatsapp_fb(request):
+    if request.POST:
+        print(request.POST)
+        sender = request.POST.get('From')
+        message = request.POST.get('Body')
+        media_url = request.POST.get('MediaUrl0')
+        print(f'whatsapp status: {sender} sent {message} media {media_url}')
+        if media_url:
+            return HttpResponse('Thank you! Your image was received.')
+        else:
+            return HttpResponse(f'Please send an image!')
+
+
+def incoming_whatsapp_status(request):
+    if request.POST:
+        print(request.POST)
+        sender = request.POST.get('From')
+        message = request.POST.get('Body')
+        print(f'whatsapp status: {sender} sent {message}')
+        if message:
+            return HttpResponse('Thank you!')
+        else:
+            return HttpResponse(f'Please send an image!')
