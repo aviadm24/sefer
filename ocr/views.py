@@ -449,6 +449,7 @@ def incoming_whatsapp(request):
         else:
             return HttpResponse(f'Please send an image!')
 
+
 def incoming_whatsapp_fb(request):
     if request.POST:
         print(request.POST)
