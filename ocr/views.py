@@ -454,7 +454,7 @@ def incoming_whatsapp(request):
         print(f'whatsapp: {sender} sent {message} media {media_url}')
         res = cloudinary.uploader.upload(media_url)
         print(f'cloudinary res : {res}')
-        tahara_image = TaharaImage.objects.update_or_create(rabbi_name='aviad')
+        tahara_image = TaharaImage.objects.create(rabbi_name='aviad')
         tahara_image.first_pesak = message
         tahara_image.image = media_url
         tahara_image.save()
