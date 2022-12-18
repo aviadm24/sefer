@@ -136,6 +136,7 @@ def TaharaImageCreateView(request):
     if request.method == 'POST':
         form = TaharaImageForm(request.POST, request.FILES)
         if form.is_valid():
+            print(form.cleaned_data)
             tahara_image = form.save(commit=False)
             # image1 = image_to_color_percentage(tahara_image.image)
             # tahara_image.color_percentage = dict(image1=image1)
@@ -447,6 +448,7 @@ def respond(message):
 @csrf_exempt
 def incoming_whatsapp(request):
     if request.POST:
+        print('files: ', request.FILES)
         print(request.POST)
         sender = request.POST.get('From')
         message = request.POST.get('Body')
@@ -458,7 +460,8 @@ def incoming_whatsapp(request):
         answer = Answers.objects.get(choice=message)
         tahara_image = TaharaImage.objects.create(rabbi_name=user)
         tahara_image.first_pesak = answer
-        tahara_image.image = media_url
+        tahara_image.image = res.get("public_id")
+        # tahara_image.image = media_url
         tahara_image.save()
         print(f'tahara image saved in db')
         # Answers.objects.all()
