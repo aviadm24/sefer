@@ -460,7 +460,7 @@ def incoming_whatsapp(request):
         answer = Answers.objects.get(choice=message)
         tahara_image = TaharaImage.objects.create(rabbi_name=user)
         tahara_image.first_pesak = answer
-        tahara_image.image = res.get("public_id")
+        tahara_image.image2 = res.get("secure_url")
         # tahara_image.image = media_url
         tahara_image.save()
         print(f'tahara image saved in db')

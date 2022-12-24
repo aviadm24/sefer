@@ -67,8 +67,8 @@ class TaharaImage(models.Model):
     release_date = models.DateField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     logo = models.TextField(blank=True)
-    image = CloudinaryField('image', default=None)  # models.ImageField(null=True, blank=True, upload_to='logo')
-    image2 = CloudinaryField('image2', default=None, null=True, blank=True)
+    image = CloudinaryField('image', default=None, null=True, blank=True)  # models.ImageField(null=True, blank=True, upload_to='logo')
+    image2 = models.URLField('image2', default=None, null=True, blank=True)
     showed_to = models.CharField(max_length=250, null=True, blank=True)  # ,choices=((user.username, user.username) for user in User.objects.all()))
     second_pesak = models.ForeignKey('Answers', related_name="%(app_label)s_%(class)s_second_pesak", blank=True,
                                     null=True, default='', on_delete=models.SET_NULL, help_text="", verbose_name="פסק")
