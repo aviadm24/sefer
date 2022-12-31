@@ -42,6 +42,7 @@ import ast
 from twilio.twiml.messaging_response import MessagingResponse
 import cloudinary
 
+
 def send_mail(user):
     context = {
         'image_url': "image_url",
@@ -59,6 +60,7 @@ def send_mail(user):
         print(response.headers)
     except Exception as e:
         print(e.message)
+
 
 MIN_WAITING_TIME = 7
 
@@ -445,6 +447,14 @@ def respond(message):
     return str(response)
 
 
+message = """
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message><Body>Hello World!</Body></Message>
+</Response>
+"""
+
+
 @csrf_exempt
 def incoming_whatsapp(request):
     if request.POST:
@@ -466,9 +476,9 @@ def incoming_whatsapp(request):
         print(f'tahara image saved in db')
         # Answers.objects.all()
         if media_url:
-            return respond('Thank you! Your image was received.')
+            return HttpResponse(message)
         else:
-            return respond(f'Please send an image!')
+            return HttpResponse(message)
 
 
 @csrf_exempt
@@ -480,9 +490,9 @@ def incoming_whatsapp_fb(request):
         media_url = request.POST.get('MediaUrl0')
         print(f'whatsapp status: {sender} sent {message} media {media_url}')
         if media_url:
-            return respond('Thank you! Your image was received.')
+            return HttpResponse(message)
         else:
-            return respond(f'Please send an image!')
+            return HttpResponse(message)
 
 
 @csrf_exempt
@@ -493,6 +503,6 @@ def incoming_whatsapp_status(request):
         message = request.POST.get('Body')
         print(f'whatsapp status: {sender} sent {message}')
         if message:
-            return HttpResponse('Thank you!')
+            return HttpResponse(message)
         else:
-            return HttpResponse(f'Please send an image!')
+            return HttpResponse(message)
