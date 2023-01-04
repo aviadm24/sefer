@@ -447,9 +447,7 @@ def respond(message):
     return str(response)
 
 
-message = """
-<?xml version="1.0" encoding="UTF-8"?>
-<Response>
+message = """<Response>
     <Message><Body>Hello World!</Body></Message>
 </Response>
 """
