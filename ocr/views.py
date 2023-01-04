@@ -461,22 +461,22 @@ def incoming_whatsapp(request):
         sender = request.POST.get('From')
         message = request.POST.get('Body')
         media_url = request.POST.get('MediaUrl0')
-        print(f'whatsapp: {sender} sent {message} media {media_url}')
-        res = cloudinary.uploader.upload(media_url)
-        print(f'cloudinary res : {res}')
-        user = User.objects.get(username='aviad')
-        answer = Answers.objects.get(choice=message)
-        tahara_image = TaharaImage.objects.create(rabbi_name=user)
-        tahara_image.first_pesak = answer
-        tahara_image.image2 = res.get("secure_url")
-        # tahara_image.image = media_url
-        tahara_image.save()
-        print(f'tahara image saved in db')
-        # Answers.objects.all()
         if media_url:
-            return HttpResponse(message)
+            print(f'whatsapp: {sender} sent {message} media {media_url}')
+            res = cloudinary.uploader.upload(media_url)
+            print(f'cloudinary res : {res}')
+            user = User.objects.get(username='aviad')
+            answer = Answers.objects.get(choice=message)
+            tahara_image = TaharaImage.objects.create(rabbi_name=user)
+            tahara_image.first_pesak = answer
+            tahara_image.image2 = res.get("secure_url")
+            # tahara_image.image = media_url
+            tahara_image.save()
+            print(f'tahara image saved in db')
+            # Answers.objects.all()
+            return respond("קיבלנו את התמונה, תודה")
         else:
-            return HttpResponse(message)
+            return respond("לא קיבלנו תמונה")
 
 
 @csrf_exempt
