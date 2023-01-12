@@ -486,11 +486,11 @@ def incoming_whatsapp_fb(request):
         sender = request.POST.get('From')
         message = request.POST.get('Body')
         media_url = request.POST.get('MediaUrl0')
-        print(f'whatsapp status: {sender} sent {message} media {media_url}')
+        print(f'whatsapp fall back: {sender} sent {message} media {media_url}')
         if media_url:
-            return HttpResponse(message)
+            return respond("image wasn't saved in db")
         else:
-            return HttpResponse(message)
+            return respond("image wasn't saved in db")
 
 
 @csrf_exempt
@@ -501,6 +501,6 @@ def incoming_whatsapp_status(request):
         message = request.POST.get('Body')
         print(f'whatsapp status: {sender} sent {message}')
         if message:
-            return HttpResponse(message)
+            return respond("whatsapp status")
         else:
-            return HttpResponse(message)
+            return respond("whatsapp status")
