@@ -41,6 +41,7 @@ from pprint import pprint
 import ast
 from twilio.twiml.messaging_response import MessagingResponse
 import cloudinary
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 
 def send_mail(user):
@@ -453,6 +454,7 @@ message = """<Response>
 """
 
 
+@xframe_options_exempt
 @csrf_exempt
 def incoming_whatsapp(request):
     if request.POST:
@@ -479,6 +481,7 @@ def incoming_whatsapp(request):
             return respond("לא קיבלנו תמונה")
 
 
+@xframe_options_exempt
 @csrf_exempt
 def incoming_whatsapp_fb(request):
     if request.POST:
@@ -493,6 +496,7 @@ def incoming_whatsapp_fb(request):
             return respond("image wasn't saved in db")
 
 
+@xframe_options_exempt
 @csrf_exempt
 def incoming_whatsapp_status(request):
     if request.POST:
