@@ -144,7 +144,7 @@ MIDDLEWARE = [
     # 'login_required.middleware.LoginRequiredMiddleware',
     #
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
