@@ -476,9 +476,9 @@ def incoming_whatsapp(request):
             tahara_image.save()
             print(f'tahara image saved in db')
             # Answers.objects.all()
-            return respond("קיבלנו את התמונה, תודה")
+            return HttpResponse(message, mime_type='application/xml')
         else:
-            return respond("לא קיבלנו תמונה")
+            return HttpResponse(message, mime_type='application/xml')
 
 
 # @xframe_options_exempt
