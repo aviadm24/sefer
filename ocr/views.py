@@ -476,9 +476,9 @@ def incoming_whatsapp(request):
             tahara_image.save()
             print(f'tahara image saved in db')
             # Answers.objects.all()
-            return HttpResponse(message, mime_type='application/xml')
+            return HttpResponse(message, content_type='text/xml')
         else:
-            return HttpResponse(message, mime_type='application/xml')
+            return HttpResponse(message, content_type='text/xml')
 
 
 # @xframe_options_exempt
@@ -491,9 +491,9 @@ def incoming_whatsapp_fb(request):
         media_url = request.POST.get('MediaUrl0')
         print(f'whatsapp fall back: {sender} sent {message} media {media_url}')
         if media_url:
-            return respond("image wasn't saved in db")
+            return HttpResponse(message, content_type='text/xml')
         else:
-            return respond("image wasn't saved in db")
+            return HttpResponse(message, content_type='text/xml')
 
 
 # @xframe_options_exempt
