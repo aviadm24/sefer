@@ -448,7 +448,9 @@ def respond(message):
     return str(response)
 
 
-message = """<Response>
+message = """
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
     <Message><Body>Hello World!</Body></Message>
 </Response>
 """
@@ -476,9 +478,9 @@ def incoming_whatsapp(request):
             tahara_image.save()
             print(f'tahara image saved in db')
             # Answers.objects.all()
-            return HttpResponse(message, content_type='text/xml')
+            return HttpResponse(message, content_type='text/xml; charset=utf-8')
         else:
-            return HttpResponse(message, content_type='text/xml')
+            return HttpResponse(message, content_type='text/xml; charset=utf-8')
 
 
 # @xframe_options_exempt
@@ -491,9 +493,9 @@ def incoming_whatsapp_fb(request):
         media_url = request.POST.get('MediaUrl0')
         print(f'whatsapp fall back: {sender} sent {message} media {media_url}')
         if media_url:
-            return HttpResponse(message, content_type='text/xml')
+            return HttpResponse(message, content_type='text/xml; charset=utf-8')
         else:
-            return HttpResponse(message, content_type='text/xml')
+            return HttpResponse(message, content_type='text/xml; charset=utf-8')
 
 
 # @xframe_options_exempt
