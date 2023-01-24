@@ -448,7 +448,7 @@ def respond(message):
     return str(response)
 
 
-message = """
+return_message = """
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Message><Body>Hello World!</Body></Message>
@@ -466,21 +466,21 @@ def incoming_whatsapp(request):
         message = request.POST.get('Body')
         media_url = request.POST.get('MediaUrl0')
         if media_url:
-            print(f'whatsapp: {sender} sent {message} media {media_url}')
-            res = cloudinary.uploader.upload(media_url)
-            print(f'cloudinary res : {res}')
-            user = User.objects.get(username='aviad')
-            answer = Answers.objects.get(choice=message)
-            tahara_image = TaharaImage.objects.create(rabbi_name=user)
-            tahara_image.first_pesak = answer
-            tahara_image.image2 = res.get("secure_url")
-            # tahara_image.image = media_url
-            tahara_image.save()
-            print(f'tahara image saved in db')
-            # Answers.objects.all()
-            return HttpResponse(message, content_type='text/xml; charset=utf-8')
+            # print(f'whatsapp: {sender} sent {message} media {media_url}')
+            # res = cloudinary.uploader.upload(media_url)
+            # print(f'cloudinary res : {res}')
+            # user = User.objects.get(username='aviad')
+            # answer = Answers.objects.get(choice=message)
+            # tahara_image = TaharaImage.objects.create(rabbi_name=user)
+            # tahara_image.first_pesak = answer
+            # tahara_image.image2 = res.get("secure_url")
+            # # tahara_image.image = media_url
+            # tahara_image.save()
+            # print(f'tahara image saved in db')
+            # # Answers.objects.all()
+            return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
         else:
-            return HttpResponse(message, content_type='text/xml; charset=utf-8')
+            return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
 
 
 # @xframe_options_exempt
@@ -493,9 +493,9 @@ def incoming_whatsapp_fb(request):
         media_url = request.POST.get('MediaUrl0')
         print(f'whatsapp fall back: {sender} sent {message} media {media_url}')
         if media_url:
-            return HttpResponse(message, content_type='text/xml; charset=utf-8')
+            return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
         else:
-            return HttpResponse(message, content_type='text/xml; charset=utf-8')
+            return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
 
 
 # @xframe_options_exempt
