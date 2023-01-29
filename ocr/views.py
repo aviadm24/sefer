@@ -309,7 +309,7 @@ def test_whatsapp(request):
     message = client.messages.create(
                                 body=body,
                                 from_='whatsapp:+972521210174',
-                                to='whatsapp:+972521210174',
+                                to='whatsapp:+972547573120',
                                 media_url=['https://res.cloudinary.com/heodokrl4/image/upload/v1674501290/nwln1wvaktjoh393dacm.jpg'],
                                 )
     print(message.sid)
@@ -490,7 +490,8 @@ def incoming_whatsapp(request):
             if message in ["1", "2", "3", "4"]:
                 answers_choice = Answers.objects.get(pk=int(message))
                 # TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice, showed_to="sms")
-                answer = Answers.objects.get(choice=message)
+                # answer = Answers.objects.get(choice=message)
+                answer = Answers.objects.get(pk=int(message))
                 tahara_image = TaharaImage.objects.create(rabbi_name=user)
                 tahara_image.first_pesak = answer
                 tahara_image.image2 = res.get("secure_url")
@@ -499,12 +500,12 @@ def incoming_whatsapp(request):
                 print(f'tahara image saved in db')
                 return_message = respond(f'המראה נשמר ביחד עם הפסק הראשון עליו: {answer} בהמשך ישלח המראה שוב למספר זה על מנת לפסוק עליו שוב')
             else:
-                return_message = respond(f" \n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n לא התקבל פסק ביחד עם התמונה נא לשלוח את התמונה שוב ביחד עם מס' מ1-4")
+                return_message = respond(f" \n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n לא התקבל פסק (מספר מ1-4) התמונה נא לשלוח את התמונה שוב ביחד עם מס' מ1-4")
 
             return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
         else:
             return_message = respond(
-                f'לא התקלה תמונה, נא להוסיף תמונה ולשלוח, במקרה של שאלה טכנית ניתן לפנות ל0547573120 (אביעד)')
+                f'לא התקבלה תמונה, נא להוסיף תמונה ולשלוח, במקרה של שאלה טכנית ניתן לפנות ל0547573120 (אביעד)')
             return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
 
 
