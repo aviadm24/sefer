@@ -42,6 +42,7 @@ import ast
 from twilio.twiml.messaging_response import MessagingResponse
 import cloudinary
 from django.views.decorators.clickjacking import xframe_options_exempt
+from twilio.rest import Client
 
 
 def send_mail(user):
@@ -299,6 +300,22 @@ def incoming_answer_from_email(request):
         return HttpResponse("תשובתך התקבלה בהצלחה תודה")
 
 
+def test_whatsapp(request):
+    account_sid = os.environ.get('TWILIO_ACCOUNT_SID', '')
+    auth_token = os.environ.get('TWILIO_AUTH_TOKEN', '')
+    client = Client(account_sid, auth_token)
+    # body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר, ניתן לשלוח עדים'
+    body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר'
+    message = client.messages.create(
+                                body=body,
+                                from_='whatsapp:+972521210174',
+                                to='whatsapp:+972521210174',
+                                media_url=['https://res.cloudinary.com/heodokrl4/image/upload/v1674501290/nwln1wvaktjoh393dacm.jpg'],
+                                )
+
+    print(message.sid)
+
+
 def test_sms(request):
     print("test sms")
     if request.GET:
@@ -451,7 +468,7 @@ def respond(message):
 return_message = """
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Message><Body>Hello World!</Body></Message>
+    <Message><Body>חלה תקלה נא לנסות שוב יותר מאוחר</Body></Message>
 </Response>
 """
 
@@ -470,20 +487,25 @@ def incoming_whatsapp(request):
             print(f'whatsapp: {sender} sent {message} media {media_url}')
             res = cloudinary.uploader.upload(media_url)
             print(f'cloudinary res : {res}')
-            user = User.objects.get(username='aviad')
-            # answers_choice = Answers.objects.get(pk=int(answer))
-            # TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice, showed_to="sms")
+            user = User.objects.get(first_name__contains=sender.split('whatsapp:+972')[1])
+            if message in ["1", "2", "3", "4"]:
+                answers_choice = Answers.objects.get(pk=int(message))
+                # TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice, showed_to="sms")
+                answer = Answers.objects.get(choice=message)
+                tahara_image = TaharaImage.objects.create(rabbi_name=user)
+                tahara_image.first_pesak = answer
+                tahara_image.image2 = res.get("secure_url")
+                # tahara_image.image = media_url
+                tahara_image.save()
+                print(f'tahara image saved in db')
+                return_message = respond(f'המראה נשמר ביחד עם הפסק הראשון עליו: {answer} בהמשך ישלח המראה שוב למספר זה על מנת לפסוק עליו שוב')
+            else:
+                return_message = respond(f" \n 1 טמא ברור \n2 טמא מסובך\n3 טהור מסובך\n4 טהור ברור\n לא התקבל פסק ביחד עם התמונה נא לשלוח את התמונה שוב ביחד עם מס' מ1-4")
 
-            answer = Answers.objects.get(choice=message)
-            tahara_image = TaharaImage.objects.create(rabbi_name=user)
-            tahara_image.first_pesak = answer
-            tahara_image.image2 = res.get("secure_url")
-            # tahara_image.image = media_url
-            tahara_image.save()
-            print(f'tahara image saved in db')
-            # Answers.objects.all()
             return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
         else:
+            return_message = respond(
+                f'לא התקלה תמונה, נא להוסיף תמונה ולשלוח, במקרה של שאלה טכנית ניתן לפנות ל0547573120 (אביעד)')
             return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
 
 
@@ -511,6 +533,6 @@ def incoming_whatsapp_status(request):
         message = request.POST.get('Body')
         print(f'whatsapp status: {sender} sent {message}')
         if message:
-            return respond("whatsapp status")
+            return HttpResponse("whatsapp status")
         else:
-            return respond("whatsapp status")
+            return HttpResponse("whatsapp status")
