@@ -312,7 +312,6 @@ def test_whatsapp(request):
                                 to='whatsapp:+972521210174',
                                 media_url=['https://res.cloudinary.com/heodokrl4/image/upload/v1674501290/nwln1wvaktjoh393dacm.jpg'],
                                 )
-
     print(message.sid)
 
 
