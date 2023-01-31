@@ -16,7 +16,7 @@ def send_whatsapp(to_number, media_url, tahara_image_id):
     message = client.messages.create(
                                 body=body,
                                 from_='whatsapp:+972521210174',
-                                to=to_number,
+                                to='whatsapp:+972'+to_number,
                                 media_url=[media_url],
                                 )
 
