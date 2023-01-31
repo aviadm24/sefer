@@ -11,8 +11,8 @@ def send_whatsapp(to_number, media_url, tahara_image_id):
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID', '')
     auth_token = os.environ.get('TWILIO_AUTH_TOKEN', '')
     client = Client(account_sid, auth_token)
-    # body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר, ניתן לשלוח עדים'
-    body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר'
+    body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר, ניתן לשלוח עדים'
+    # body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר'
     message = client.messages.create(
                                 body=body,
                                 from_='whatsapp:+972521210174',
