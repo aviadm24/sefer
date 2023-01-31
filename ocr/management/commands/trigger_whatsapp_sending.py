@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 print('MIN_WAITING_TIME: ', MIN_WAITING_TIME)
             except:
                 MIN_WAITING_TIME = 1
-
+            MIN_WAITING_TIME = 1  # to delete
             qs = TaharaImage.objects.filter(rabbi_name=user). \
                 filter(release_date__lte=datetime.now() - timedelta(days=MIN_WAITING_TIME)).filter(
                 second_pesak__exact=None)
@@ -48,7 +48,7 @@ class Command(BaseCommand):
                 # print(image.image2.url)
             print("phone: ", user.first_name)
             self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
-            if qs.count() > 0 and user.first_name:
+            if qs.count() > 0 and user.first_name == '547573120':
                 send_whatsapp(user.first_name, qs[0].image.url, qs[0].id)
 
         self.stdout.write(self.style.SUCCESS('sent whatsapp'))
