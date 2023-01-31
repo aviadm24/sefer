@@ -44,12 +44,12 @@ class Command(BaseCommand):
             # print('yesterdy: ', timezone.now() - timedelta(days=1))
             print('qs.count() : ', qs.count())
             for image in qs:
-                print(image.image.url)
+                print(image.image2.url)
                 # print(image.image2.url)
             print("phone: ", user.first_name)
             self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
             if qs.count() > 0 and user.first_name == '547573120':
-                send_whatsapp(user.first_name, qs[0].image.url, qs[0].id)
+                send_whatsapp(user.first_name, qs[0].image2.url, qs[0].id)
 
         self.stdout.write(self.style.SUCCESS('sent whatsapp'))
         # except:
