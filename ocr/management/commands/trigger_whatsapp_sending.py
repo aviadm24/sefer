@@ -7,17 +7,21 @@ import os
 from twilio.rest import Client
 
 
-def send_whatsapp(to_number, media_url, tahara_image_id):
+def send_whatsapp(user, media_url, tahara_image_id):
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID', '')
     auth_token = os.environ.get('TWILIO_AUTH_TOKEN', '')
     client = Client(account_sid, auth_token)
-    body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר, ניתן לשלוח עדים'
-    # body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר'
+    milui = "לפסוק על"
+    # body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר, ניתן לשלוח עדים'
+    body = f""" שלום{user.username} נא {milui} תמונה 
+    {media_url}
+    , נא לענות במס' 1 טמא ברור, 2 טמא מסובך, 3 טהור מסובך, 4 טהור ברור"""
+
     message = client.messages.create(
                                 body=body,
                                 from_='whatsapp:+972521210174',
-                                to='whatsapp:+972'+to_number,
-                                media_url=[media_url],
+                                to='whatsapp:+972'+user.first_name,
+                                # media_url=[media_url],
                                 )
 
     print(message.sid)
@@ -49,7 +53,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'qs.count() : {qs.count()}'))
             if qs.count() > 0 and user.first_name == '547573120':
                 print("phone: ", user.first_name)
-                send_whatsapp(user.first_name, qs[0].image2, qs[0].id)
+                send_whatsapp(user, qs[0].image2, qs[0].id)
 
         self.stdout.write(self.style.SUCCESS('sent whatsapp'))
         # except:
