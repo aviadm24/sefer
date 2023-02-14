@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
-from ocr.models import TaharaImage, WaitTime
+from ocr.models import TaharaImage, WaitTime, Comment
 from datetime import timedelta, datetime
 import time
 import os
@@ -22,7 +22,7 @@ def send_whatsapp(user, media_url, tahara_image_id):
                                 body=body,
                                 from_='whatsapp:+972521210174',
                                 to='whatsapp:+972'+user.first_name,
-                                # media_url=[media_url],
+                                media_url=[media_url],
                                 )
 
     print(message.sid)
@@ -56,10 +56,13 @@ class Command(BaseCommand):
                 print("phone: ", user.first_name)
                 send_whatsapp(user, qs[0].image2, qs[0].id)
 
-        self.stdout.write(self.style.SUCCESS('sent whatsapp'))
         # except:
         #     self.stdout.write(self.style.ERROR('an exception has acourred'))
         #     return
+        obj, created = Comment.objects.update_or_create(
+            id=1,
+            choice=str(qs[0].id),
+            )
 
         self.stdout.write(self.style.SUCCESS('Successfully sent whatsapp'))
         return

@@ -13,7 +13,7 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from datetime import timedelta, datetime
 from django.views.generic import TemplateView, CreateView
-from .models import TaharaImage, Answers
+from .models import TaharaImage, Answers, Comment
 from django.contrib.auth.models import User
 from .forms import TaharaImageForm
 from django.utils import timezone
@@ -481,12 +481,12 @@ def incoming_whatsapp(request):
         sender = request.POST.get('From')
         message = request.POST.get('Body')
         media_url = request.POST.get('MediaUrl0')
+        user = User.objects.get(first_name__contains=sender.split('whatsapp:+972')[1])
         print(f'whatsapp: {sender} sent {message} media {media_url}')
         if media_url:
             print(f'whatsapp: {sender} sent {message} media {media_url}')
             res = cloudinary.uploader.upload(media_url)
             print(f'cloudinary res : {res}')
-            user = User.objects.get(first_name__contains=sender.split('whatsapp:+972')[1])
             if message in ["1", "2", "3", "4"]:
                 answers_choice = Answers.objects.get(pk=int(message))
                 # TaharaImage.objects.filter(id=int(image_id)).update(second_pesak=answers_choice, showed_to="sms")
@@ -504,7 +504,14 @@ def incoming_whatsapp(request):
 
             return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
         else:
-            return_message = respond(
+            if message in ["1", "2", "3", "4"]:
+                answer = Answers.objects.get(pk=int(message))
+                last_sent_image_id = Comment.objects.get(id=1).choice
+                TaharaImage.objects.filter(id=int(last_sent_image_id)).update(second_pesak=answer, showed_to="whatsapp")
+                return_message = respond(
+                    f'התקבל פסק שני {answer} לתמונה: {last_sent_image_id}')
+            else:
+                return_message = respond(
                 f'לא התקבלה תמונה, נא להוסיף תמונה ולשלוח, במקרה של שאלה טכנית ניתן לפנות ל0547573120 (אביעד)')
             return HttpResponse(return_message, content_type='text/xml; charset=utf-8')
 
