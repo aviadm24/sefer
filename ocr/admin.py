@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TaharaImage, Answers, Light, CameraDevice, CameraConfig, Comment, WaitTime
+from .models import TaharaImage, Answers, Light, CameraDevice, CameraConfig, Comment, WaitTime, LastSentImage
 import base64
 from django.utils.html import format_html
 
@@ -14,6 +14,7 @@ from django.utils.html import format_html
 class TaharaImageAdmin(admin.ModelAdmin):
     list_filter = (
         ("second_pesak", admin.EmptyFieldListFilter),
+        ("rabbi_name__username")
     )
 
     # readonly_fields = ["image_logo", ]
@@ -30,3 +31,4 @@ admin.site.register(CameraDevice)
 admin.site.register(CameraConfig)
 admin.site.register(Comment)
 admin.site.register(WaitTime)
+admin.site.register(LastSentImage)

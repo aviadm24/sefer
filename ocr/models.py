@@ -54,6 +54,13 @@ class WaitTime(models.Model):
         return str(self.days)
 
 
+class LastSentImage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=1000, blank=True, null=True, default='')
+    project_type = models.CharField(max_length=1000, blank=True, null=True, default='')
+    image_id = models.BigIntegerField()
+
+
 class TaharaImage(models.Model):
     # ANSWERS = (
     #     ('good', 'טהור'),

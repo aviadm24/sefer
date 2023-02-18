@@ -13,7 +13,7 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.list import ListView
 from datetime import timedelta, datetime
 from django.views.generic import TemplateView, CreateView
-from .models import TaharaImage, Answers, Comment
+from .models import TaharaImage, Answers, LastSentImage
 from django.contrib.auth.models import User
 from .forms import TaharaImageForm
 from django.utils import timezone
@@ -506,7 +506,7 @@ def incoming_whatsapp(request):
         else:
             if message in ["1", "2", "3", "4"]:
                 answer = Answers.objects.get(pk=int(message))
-                last_sent_image_id = Comment.objects.get(id=1).choice
+                last_sent_image_id = LastSentImage.objects.get(user=user).image_id
                 TaharaImage.objects.filter(id=int(last_sent_image_id)).update(second_pesak=answer, showed_to="whatsapp")
                 return_message = respond(
                     f'התקבל פסק שני {answer} לתמונה: {last_sent_image_id}')
