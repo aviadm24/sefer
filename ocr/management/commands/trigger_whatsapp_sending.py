@@ -14,15 +14,16 @@ def send_whatsapp(user, media_url, tahara_image_id):
     milui = "לפסוק על"
     # body = 'שלום אביעד זוהי תזכורת להשתתפות במחקר, ניתן לשלוח עדים'
     body = f""" שלום{user.username} נא {milui}תמונה \n{media_url}\n, נא לענות במס' 1 טמא ברור, 2 טמא מסובך, 3 טהור מסובך, 4 טהור ברור"""
-    body = f"""שלום {user.username} נא {milui} תמונה 
+    #  שלום {{1}} מצורף הקישור לתמונה {{2}}} נא ענה במספר 1 טמא ברור, 2 טמא מסובך, 3 טהור מסובך, 4 טהור ברור
+    body = f"""שלום {user.username} מצורף הקישור לתמונה 
 {media_url}
-, נא לענות במס' 1 טמא ברור, 2 טמא מסובך, 3 טהור מסובך, 4 טהור ברור"""
+, נא ענה במס' 1 טמא ברור, 2 טמא מסובך, 3 טהור מסובך, 4 טהור ברור"""
 
     message = client.messages.create(
                                 body=body,
                                 from_='whatsapp:+972521210174',
                                 to='whatsapp:+972'+user.first_name,
-                                # media_url=[media_url],
+                                media_url=[media_url],
                                 )
 
     print(message.sid)
