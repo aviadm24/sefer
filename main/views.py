@@ -10,9 +10,6 @@ from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from .gematria import int_to_gematria
-import openpyxl
-import pandas as pd
-import numpy as np
 import logging
 logging.basicConfig(filename='views.log', filemode='w', level=logging.DEBUG)  # , encoding='utf-8' - has a bug
 logging.debug("test")

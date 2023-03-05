@@ -24,7 +24,6 @@ from django.db.models import F, Q
 from PIL import Image
 # import matplotlib.pyplot as plt
 # from io import StringIO
-import numpy as np
 import json
 from cloudinary.forms import cl_init_js_callbacks
 import six
